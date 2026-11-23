@@ -72,7 +72,7 @@ const METHODS={tunai:'Tunai',transfer:'Transfer bank',qris:'QRIS',edc:'EDC/Kartu
 const S={user:null,mems:[],biz:null,role:null,cats:[],members:[],tab:null};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const rp=n=>'Rp'+Number(n||0).toLocaleString('id-ID',{maximumFractionDigits:0});
+const rp=n=>{const v=Number(n||0);return (v<0?'−':'')+'Rp'+Math.abs(v).toLocaleString('id-ID',{maximumFractionDigits:0})};
 const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jakarta'}).format(new Date());
 const addDays=(d,n)=>{const x=new Date(d+'T00:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10)};
 const fmtD=d=>new Date(d+'T00:00:00').toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
@@ -345,7 +345,9 @@ async function viewLap(){
   $('#rGo').onclick=loadLap;$('#rCsv').onclick=csv;loadLap();
 }
 async function loadLap(){
-  const F=$('#rF').value,T=$('#rT').value;if(F>T)return toast('Tanggal awal melewati tanggal akhir');
+  let F=$('#rF').value;const T=$('#rT').value;if(F>T)return toast('Tanggal awal melewati tanggal akhir');
+  if(F<S.biz.start_date){F=S.biz.start_date;$('#rF').value=F}
+  if(F>T)return toast('Usaha baru aktif sejak '+fmtD(S.biz.start_date));
   $('#rep').innerHTML='<div class="card muted">Menyusun laporan...</div>';
   const [{data:cp,error:e1},{data:tx,error:e2},{data:cl}]=await Promise.all([
     sb.rpc('owner_cash_position',{bid:S.biz.id,d:F}),
