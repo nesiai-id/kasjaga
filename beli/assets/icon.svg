@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#ffc400"/>
+  <rect x="150" y="402" width="44" height="34" rx="8" fill="#0b3d26"/>
+  <rect x="318" y="402" width="44" height="34" rx="8" fill="#0b3d26"/>
+  <rect x="96" y="86" width="320" height="326" rx="40" fill="#0f5132"/>
+  <rect x="124" y="114" width="264" height="270" rx="24" fill="#198754"/>
+  <rect x="124" y="114" width="264" height="270" rx="24" fill="none" stroke="#0b3d26" stroke-width="6"/>
+  <rect x="356" y="168" width="18" height="52" rx="8" fill="#0b3d26"/>
+  <rect x="356" y="278" width="18" height="52" rx="8" fill="#0b3d26"/>
+  <circle cx="244" cy="249" r="74" fill="#ffffff"/>
+  <circle cx="244" cy="249" r="56" fill="#0f5132"/>
+  <g stroke="#ffffff" stroke-width="14" stroke-linecap="round">
+    <line x1="244" y1="205" x2="244" y2="293"/>
+    <line x1="200" y1="249" x2="288" y2="249"/>
+    <line x1="213" y1="218" x2="275" y2="280"/>
+    <line x1="275" y1="218" x2="213" y2="280"/>
+  </g>
+  <circle cx="244" cy="249" r="22" fill="#ffc400"/>
+</svg>
