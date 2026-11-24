@@ -392,12 +392,32 @@ async function viewTim(){
    <button class="btn sec" onclick="navigator.clipboard&&navigator.clipboard.writeText('Gabung KasJaga ${esc(S.biz.name)}: buka ${location.href.split('#')[0]} lalu daftar, masukkan kode usaha ${esc(S.biz.join_code)}');toast('Pesan undangan disalin')">Salin pesan undangan</button></div>
    <div class="card"><h2>Anggota</h2><div class="list">${S.members.map(m=>`<div class="it"><div><b>${esc(m.display_name)}</b><div class="muted">${m.role==='owner'?'Owner':'Staf'} · bergabung ${fmtT(m.created_at)}</div></div>
    ${m.role==='staff'?`<button class="btn sm ${m.active?'sec':''}" onclick="toggleMem('${m.user_id}',${!m.active})">${m.active?'Nonaktifkan':'Aktifkan'}</button>`:''}</div>`).join('')}</div></div>
-   <div class="card"><h2>Kategori</h2><div class="list">${S.cats.map(c=>`<div class="it"><div><span class="tag ${c.direction}">${c.direction==='in'?'Masuk':'Keluar'}</span> ${esc(c.name)}</div></div>`).join('')}</div>
+   <div class="card"><h2>Kategori</h2><p class="muted">Ketuk Ubah untuk mengganti nama atau jenis kategori.</p><div class="list" id="catList">${S.cats.map(catRow).join('')}</div>
    <div class="grid2"><input id="nCat" placeholder="Kategori baru"><select id="nDir"><option value="out">Keluar</option><option value="in">Masuk</option></select></div>
    <div style="height:8px"></div><button class="btn sec" id="nAdd">Tambah kategori</button></div>`;
   $('#nAdd').onclick=async()=>{const name=$('#nCat').value.trim();if(!name)return;const {error}=await sb.from('categories').insert({business_id:S.biz.id,name,direction:$('#nDir').value});
     if(error)return toast(errMsg(error));const {data}=await sb.from('categories').select('*').eq('business_id',S.biz.id).order('name');S.cats=data;toast('Kategori ditambah');viewTim()};
 }
+function catRow(c){return `<div class="it" id="cat-${c.id}"><div><span class="tag ${c.direction}">${c.direction==='in'?'Masuk':'Keluar'}</span> ${esc(c.name)}</div>
+  <div class="row"><button class="btn sm sec" onclick="editCat('${c.id}')">Ubah</button><button class="btn sm sec" style="color:var(--r)" onclick="delCat('${c.id}')">Hapus</button></div></div>`}
+async function reloadCats(){const {data}=await sb.from('categories').select('*').eq('business_id',S.biz.id).order('name');S.cats=data||[]}
+async function catUsage(id){const {count}=await sb.from('transactions').select('id',{count:'exact',head:true}).eq('category_id',id);return count||0}
+function editCat(id){const c=S.cats.find(x=>x.id===id);if(!c)return;const el=document.getElementById('cat-'+id);
+  el.innerHTML=`<div style="flex:1"><div class="grid2"><input id="eCat-${id}" value="${esc(c.name)}" maxlength="60"><select id="eDir-${id}"><option value="out" ${c.direction==='out'?'selected':''}>Keluar</option><option value="in" ${c.direction==='in'?'selected':''}>Masuk</option></select></div>
+  <div class="row" style="margin-top:8px"><button class="btn sm" onclick="saveCat('${id}')">Simpan</button><button class="btn sm sec" onclick="viewTim()">Batal</button></div></div>`;
+  document.getElementById('eCat-'+id).focus()}
+async function saveCat(id){const c=S.cats.find(x=>x.id===id);if(!c)return;
+  const name=document.getElementById('eCat-'+id).value.trim(),dir=document.getElementById('eDir-'+id).value;
+  if(!name)return toast('Nama kategori tidak boleh kosong');
+  if(S.cats.some(x=>x.id!==id&&x.direction===dir&&x.name.toLowerCase()===name.toLowerCase()))return toast('Kategori dengan nama itu sudah ada');
+  if(dir!==c.direction){const n=await catUsage(id);if(n>0)return toast(`Jenis tidak bisa diubah: kategori ini sudah dipakai ${n} transaksi. Ubah namanya saja, atau buat kategori baru.`)}
+  const {error}=await sb.from('categories').update({name,direction:dir}).eq('id',id).eq('business_id',S.biz.id);if(error)return toast(errMsg(error));
+  await reloadCats();toast('Kategori diperbarui');viewTim()}
+async function delCat(id){const c=S.cats.find(x=>x.id===id);if(!c)return;const n=await catUsage(id);
+  const msg=n>0?`Hapus kategori "${esc(c.name)}"? Kategori ini dipakai ${n} transaksi. Transaksinya tetap ada, tetapi kategorinya menjadi kosong (—).`:`Hapus kategori "${esc(c.name)}"?`;
+  if(!await confirmBox(msg,'Hapus'))return;
+  const {error}=await sb.from('categories').delete().eq('id',id).eq('business_id',S.biz.id);if(error)return toast(errMsg(error));
+  await reloadCats();toast('Kategori dihapus');viewTim()}
 async function toggleMem(uid,v){const {error}=await sb.from('members').update({active:v}).eq('business_id',S.biz.id).eq('user_id',uid);if(error)return toast(errMsg(error));toast(v?'Staf diaktifkan':'Staf dinonaktifkan');viewTim()}
 
 sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_OUT')viewAuth()});
