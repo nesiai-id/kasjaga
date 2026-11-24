@@ -68,7 +68,7 @@ nav.tabs button.on{color:var(--g);font-weight:700}
 const SUPABASE_URL='https://fshsvlcjyrbydcsriczm.supabase.co';
 const SUPABASE_KEY='sb_publishable_DHIIv3j-KKU2UTyBWkwNwQ_r7uccK7H';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const METHODS={tunai:'Tunai',transfer:'Transfer bank',qris:'QRIS',edc:'EDC/Kartu',ewallet:'E-wallet',lainnya:'Lainnya'};
+const METHODS={tunai:'Tunai',transfer:'Transfer bank',qris:'QRIS',edc:'EDC/Kartu',ewallet:'E-wallet',dana:'DANA',grab:'Grab',gojek:'Gojek',lainnya:'Lainnya'};
 const S={user:null,mems:[],biz:null,role:null,cats:[],members:[],tab:null};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
