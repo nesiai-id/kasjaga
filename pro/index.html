@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e3a8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>OwnerKas Pro — Kendali Keuangan Usaha</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{--p:#1e3a8a;--p2:#2563eb;--pl:#e8efff;--g:#15803d;--gl:#e7f6ec;--r:#b42318;--rl:#fdecea;--a:#b54708;--al:#fff4e5;--t:#1d2939;--m:#667085;--b:#e4e7ec;--bg:#f5f7fb}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--t);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select,textarea{font:inherit}
+.wrap{max-width:780px;margin:0 auto;padding:12px 14px 92px}
+header.top{background:var(--p);color:#fff;padding:12px 14px;position:sticky;top:0;z-index:5}
+header.top .row{max-width:780px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{font-weight:800;letter-spacing:.3px;cursor:default}.brand small{display:block;font-weight:400;opacity:.85;font-size:12px}
+.card{background:#fff;border:1px solid var(--b);border-radius:14px;padding:14px;margin:10px 0}
+h2{font-size:17px;margin:4px 0 10px}h3{font-size:15px;margin:12px 0 6px}
+label{display:block;font-size:13px;color:var(--m);margin:10px 0 4px}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--b);border-radius:10px;background:#fff}
+input[type=checkbox]{width:auto;margin-right:6px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--p2);border-color:transparent}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 16px;border-radius:10px;border:0;background:var(--p2);color:#fff;font-weight:600;cursor:pointer;text-decoration:none}
+.btn.full{width:100%}.btn.sec{background:#fff;color:var(--t);border:1px solid var(--b)}.btn.red{background:var(--r)}.btn.grn{background:var(--g)}.btn.sm{padding:6px 10px;font-size:13px}
+.btn:disabled{opacity:.6}
+.seg{display:flex;gap:6px}.seg button{flex:1;padding:10px;border:1px solid var(--b);border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
+.seg button.on{background:var(--pl);border-color:var(--p2);color:var(--p)}
+.seg button.on.in{background:var(--gl);border-color:var(--g);color:var(--g)}.seg button.on.out{background:var(--rl);border-color:var(--r);color:var(--r)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{background:#fff;border:1px solid var(--b);border-radius:12px;padding:10px}.kpi .l{font-size:12px;color:var(--m)}.kpi .v{font-size:18px;font-weight:700}
+.muted{color:var(--m);font-size:13px}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600}
+.tag.in{background:var(--gl);color:var(--g)}.tag.out{background:var(--rl);color:var(--r)}.tag.w{background:var(--al);color:var(--a)}.tag.p{background:var(--pl);color:var(--p)}.tag.x{background:#f2f4f7;color:var(--m)}
+.list .it{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--b)}
+.list .it:last-child{border:0}.amt{font-weight:700;white-space:nowrap}.amt.in{color:var(--g)}.amt.out{color:var(--r)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:7px 6px;border-bottom:1px solid var(--b);text-align:left;vertical-align:top}th{color:var(--m);font-weight:600}td.n,th.n{text-align:right}
+.tblw{overflow-x:auto}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--b);display:flex;justify-content:center;z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs .in{display:flex;max-width:780px;width:100%}
+nav.tabs button{flex:1;border:0;background:none;padding:9px 2px 10px;font-size:11.5px;color:var(--m);cursor:pointer;position:relative}
+nav.tabs button b{display:block;font-size:18px}
+nav.tabs button.on{color:var(--p);font-weight:700}
+.badge{position:absolute;top:4px;left:calc(50% + 6px);background:var(--r);color:#fff;border-radius:99px;font-size:10.5px;font-weight:700;padding:1px 6px}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#101828;color:#fff;padding:10px 14px;border-radius:10px;z-index:50;max-width:90%;display:none}
+.modal{position:fixed;inset:0;background:rgba(16,24,40,.55);display:none;align-items:flex-end;justify-content:center;z-index:40}
+.modal .box{background:#fff;width:100%;max-width:580px;border-radius:16px 16px 0 0;padding:16px;max-height:90vh;overflow:auto}
+@media(min-width:640px){.modal{align-items:center}.modal .box{border-radius:16px}}
+.hide{display:none!important}
+.alert{padding:10px 12px;border-radius:10px;font-size:13px}.alert.w{background:var(--al);color:var(--a)}.alert.ok{background:var(--gl);color:var(--g)}.alert.e{background:var(--rl);color:var(--r)}.alert.i{background:var(--pl);color:var(--p)}
+.row{display:flex;gap:8px;align-items:center}.sp{justify-content:space-between}.wrapf{flex-wrap:wrap}
+.code{font:700 22px/1 ui-monospace,monospace;letter-spacing:3px;background:var(--pl);color:var(--p);padding:10px 14px;border-radius:10px;display:inline-block}
+.photo{width:100%;border-radius:10px;margin-top:6px}
+.menu{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.menu button{background:#fff;border:1px solid var(--b);border-radius:14px;padding:16px 12px;text-align:left;cursor:pointer;position:relative}
+.menu button b{display:block;font-size:22px;margin-bottom:6px}.menu button span{font-weight:700}.menu button small{display:block;color:var(--m);font-size:12px;margin-top:2px}
+.menu .badge{top:10px;left:auto;right:10px}
+.acc{border:1px solid var(--b);border-radius:12px;padding:12px;margin:8px 0}
+@media print{header.top,nav.tabs,.noprint,.btn{display:none!important}.wrap{padding:0}.card{border:0}}
+</style>
+</head>
+<body>
+<header class="top"><div class="row">
+  <div class="brand">OwnerKas Pro<small id="bizName">Uang usaha tercatat, owner tetap pegang kendali</small></div>
+  <div class="row"><span id="whoami" class="muted" style="color:#dbe6ff"></span><button id="btnOut" class="btn sm sec hide" onclick="logout()">Keluar</button></div>
+</div></header>
+
+<main class="wrap" id="app"></main>
+<nav class="tabs hide" id="tabs"><div class="in" id="tabsIn"></div></nav>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="box" id="modalBox"></div></div>
+
+<script>
+const SUPABASE_URL='https://fiveybwfffodhgssgdsc.supabase.co';
+const SUPABASE_KEY='sb_publishable_Z2XfKu7ITQsFn3Pc43GMvA_tKZk8b5Y';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const METHODS={tunai:'Tunai',transfer:'Transfer bank',qris:'QRIS',edc:'EDC/Kartu',ewallet:'E-wallet',dana:'DANA',grab:'Grab',gojek:'Gojek',lainnya:'Lainnya'};
+const SOURCES={kasbon:'Kasbon',piutang:'Piutang',hutang:'Hutang',pindah:'Pindah dana'};
+const BTYPE={dagang:'Perdagangan (jual barang)',jasa:'Jasa',campuran:'Barang & jasa'};
+const S={user:null,mems:[],biz:null,role:null,cats:[],members:[],accs:[],branches:[],br:null,pend:0,tab:null};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rp=n=>{const v=Number(n||0);return (v<0?'−':'')+'Rp'+Math.abs(v).toLocaleString('id-ID',{maximumFractionDigits:0})};
+const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jakarta'}).format(new Date());
+const addDays=(d,n)=>{const x=new Date(d+'T00:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10)};
+const dayDiff=(a,b)=>Math.round((new Date(a+'T00:00:00Z')-new Date(b+'T00:00:00Z'))/864e5);
+const fmtD=d=>new Date(d+'T00:00:00').toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+const fmtDs=d=>new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+const fmtT=t=>new Date(t).toLocaleString('id-ID',{timeZone:'Asia/Jakarta',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const num=v=>Number(String(v||'').replace(/[^\d]/g,''))||0;
+const isOwner=()=>S.role==='owner';
+function toast(m,ms=2800){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',ms)}
+function openModal(h){$('#modalBox').innerHTML=h;$('#modal').style.display='flex'}
+function closeModal(){$('#modal').style.display='none'}
+function confirmBox(msg,okLabel='Ya, lanjut',danger=true){return new Promise(res=>{openModal(`<h2>Konfirmasi</h2><p>${msg}</p><div class="row" style="justify-content:flex-end"><button class="btn sec" id="cNo">Batal</button><button class="btn ${danger?'red':''}" id="cYes">${okLabel}</button></div>`);$('#cNo').onclick=()=>{closeModal();res(false)};$('#cYes').onclick=()=>{closeModal();res(true)}})}
+function errMsg(e){const m=(e&&(e.message||e.error_description))||String(e);
+  if(/Invalid login/i.test(m))return 'Email atau password salah.';
+  if(/already registered/i.test(m))return 'Email sudah terdaftar. Silakan masuk.';
+  if(/Password should be/i.test(m))return 'Password minimal 6 karakter.';
+  if(/row-level security/i.test(m))return 'Anda tidak punya akses untuk tindakan ini.';
+  if(/Failed to fetch/i.test(m))return 'Koneksi internet terputus. Coba lagi.';
+  return m}
+function moneyInput(el){if(!el)return;el.addEventListener('input',()=>{const n=num(el.value);el.value=n?n.toLocaleString('id-ID'):''})}
+const fmtMoney=v=>v?Number(v).toLocaleString('id-ID'):'';
+const last4=s=>s?String(s).slice(-4):'';
+function accLabel(a,full){if(!a)return '—';return a.bank_name+(a.account_no?(full&&isOwner()?' '+a.account_no:' ••'+last4(a.account_no)):'')+(full&&a.holder_name?' a.n. '+a.holder_name:'')}
+const accById=id=>S.accs.find(a=>a.id===id);
+function accOptions(sel,withNone=true,onlyActive=true){return (withNone?`<option value="">— tanpa rekening —</option>`:'')+S.accs.filter(a=>!onlyActive||a.active||a.id===sel).map(a=>`<option value="${a.id}" ${a.id===sel?'selected':''}>${esc(accLabel(a))}</option>`).join('')}
+function methodOptions(sel,extra=''){return Object.entries(METHODS).map(([k,v])=>`<option value="${k}" ${sel===k?'selected':''}>${v}</option>`).join('')+extra}
+/* payment picker: method + account; returns {method,acc} */
+const actBr=()=>S.branches.filter(b=>b.active);
+const multiBr=()=>actBr().length>1;
+const brName=id=>(S.branches.find(b=>b.id===id)||{}).name||'—';
+const mainBr=()=>(actBr()[0]||S.branches[0]||{}).id;
+function brOptions(sel,withAll){return (withAll?`<option value="">Semua cabang</option>`:'')+S.branches.filter(b=>b.active||b.id===sel).map(b=>`<option value="${b.id}" ${b.id===sel?'selected':''}>${esc(b.name)}</option>`).join('')}
+function brBar(fn){if(!isOwner()||!multiBr())return '';return `<div class="card noprint" style="padding:10px 14px"><div class="row"><span class="muted" style="white-space:nowrap">Cabang</span><select id="brSel" onchange="S.br=this.value||null;${fn}">${brOptions(S.br,true)}</select></div></div>`}
+function payPicker(prefix,{method='tunai',acc=null,potong=false,br=null,nobr=false}={}){
+  return `<div class="grid2"><div><label>Metode</label><select id="${prefix}Met">${methodOptions(method,potong?'<option value="potong_gaji">Potong gaji (tanpa uang)</option>':'')}</select></div>
+   <div id="${prefix}AccW"><label>Rekening</label><select id="${prefix}Acc">${accOptions(acc)}</select></div>
+   ${!nobr&&isOwner()&&multiBr()?`<div id="${prefix}BrW"><label>Kas cabang</label><select id="${prefix}Br">${brOptions(br||S.br||mainBr())}</select></div>`:''}</div>`}
+function bindPayPicker(prefix){const f=()=>{const m=$('#'+prefix+'Met').value;$('#'+prefix+'AccW').classList.toggle('hide',m==='tunai'||m==='potong_gaji');const bw=$('#'+prefix+'BrW');if(bw)bw.classList.toggle('hide',m!=='tunai')};$('#'+prefix+'Met').onchange=f;f()}
+function readPay(prefix){const m=$('#'+prefix+'Met').value;const a=(m==='tunai'||m==='potong_gaji')?null:($('#'+prefix+'Acc').value||null);
+  if(m==='transfer'&&!a)throw new Error('Pilih rekening untuk metode transfer. Tambahkan rekening di menu Rekening Bank.');
+  const b=$('#'+prefix+'Br');return {method:m,acc:a,br:b&&m==='tunai'?b.value:null}}
+
+/* ---------- AUTH ---------- */
+function viewAuth(mode='login'){
+  $('#tabs').classList.add('hide');$('#btnOut').classList.add('hide');$('#whoami').textContent='';
+  $('#app').innerHTML=`<div class="card" style="margin-top:24px">
+  <h2>${mode==='login'?'Masuk ke OwnerKas Pro':'Daftar akun baru'}</h2>
+  <p class="muted">${mode==='login'?'Owner dan karyawan masuk lewat halaman yang sama.':'Owner: daftar lalu masukkan kode aktivasi dari email pembelian. Karyawan: daftar lalu masukkan kode usaha dari owner.'}</p>
+  <label>Email</label><input id="aEmail" type="email" autocomplete="email" placeholder="nama@email.com">
+  <label>Password</label><input id="aPass" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}" placeholder="minimal 6 karakter">
+  <div style="height:12px"></div>
+  <button class="btn full" id="aBtn">${mode==='login'?'Masuk':'Daftar'}</button>
+  <p class="muted" style="text-align:center;margin-top:12px">${mode==='login'?'Belum punya akun? <a href="#" id="aSw">Daftar</a>':'Sudah punya akun? <a href="#" id="aSw">Masuk</a>'}</p>
+  </div>`;
+  $('#aSw').onclick=e=>{e.preventDefault();viewAuth(mode==='login'?'signup':'login')};
+  $('#aBtn').onclick=async()=>{const email=$('#aEmail').value.trim(),password=$('#aPass').value;
+    if(!email||!password)return toast('Isi email dan password');
+    $('#aBtn').disabled=true;
+    const r=mode==='login'?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password});
+    $('#aBtn').disabled=false;
+    if(r.error)return toast(errMsg(r.error));
+    if(mode==='signup'&&!r.data.session)return toast('Cek email Anda untuk konfirmasi, lalu masuk.',5000);
+    boot()};
+}
+async function logout(){await sb.auth.signOut();S.biz=null;viewAuth()}
+
+/* ---------- ONBOARD ---------- */
+function viewOnboard(){
+  $('#tabs').classList.add('hide');
+  $('#app').innerHTML=`<div class="card"><h2>Selamat datang 👋</h2><p class="muted">Akun Anda belum terhubung ke usaha mana pun. Pilih salah satu:</p></div>
+  <div class="card"><h3>Saya OWNER (pembeli OwnerKas Pro)</h3>
+   <label>Kode aktivasi (dari email/WA pembelian)</label><input id="oCode" placeholder="OKP-XXXX-XXXX" style="text-transform:uppercase">
+   <label>Nama usaha</label><input id="oBiz" placeholder="cth. Bengkel Maju Jaya">
+   <label>Jenis usaha</label><select id="oType">${Object.entries(BTYPE).map(([k,v])=>`<option value="${k}" ${k==='campuran'?'selected':''}>${v}</option>`).join('')}</select>
+   <label>Nama Anda</label><input id="oName" placeholder="cth. Pak Emir">
+   <label>Saldo kas tunai saat ini (uang di laci/brankas)</label><input id="oOpen" inputmode="numeric" placeholder="0">
+   <p class="muted">Rekening bank dan e-wallet ditambahkan setelah aktif, di menu Rekening Bank.</p>
+   <button class="btn full" id="oBtn">Aktifkan usaha</button></div>
+  <div class="card"><h3>Saya KARYAWAN (kasir/admin/keuangan)</h3>
+   <label>Kode usaha (minta ke owner)</label><input id="sCode" placeholder="8 karakter" style="text-transform:uppercase">
+   <label>Nama Anda</label><input id="sName" placeholder="cth. Rina (kasir)">
+   <div style="height:12px"></div><button class="btn full sec" id="sBtn">Gabung ke usaha</button></div>`;
+  moneyInput($('#oOpen'));
+  $('#oBtn').onclick=async()=>{const c=$('#oCode').value.trim(),b=$('#oBiz').value.trim(),n=$('#oName').value.trim();
+    if(!c||!b||!n)return toast('Lengkapi kode, nama usaha, dan nama Anda');
+    const {error}=await sb.rpc('activate_business',{license_code:c,biz_name:b,owner_name:n,opening:num($('#oOpen').value),btype:$('#oType').value});
+    if(error)return toast(errMsg(error));toast('Usaha aktif!');boot()};
+  $('#sBtn').onclick=async()=>{const c=$('#sCode').value.trim(),n=$('#sName').value.trim();
+    if(!c||!n)return toast('Isi kode usaha dan nama Anda');
+    const {error}=await sb.rpc('join_business',{code:c,staff_name:n});
+    if(error)return toast(errMsg(error));toast('Berhasil bergabung');boot()};
+}
+
+/* ---------- BOOT ---------- */
+async function boot(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session)return viewAuth();
+  S.user=session.user;$('#btnOut').classList.remove('hide');
+  const {data,error}=await sb.from('members').select('business_id,role,display_name,active,businesses(*)').eq('user_id',S.user.id);
+  if(error)return toast(errMsg(error));
+  S.mems=(data||[]).filter(m=>m.active);
+  if(!S.mems.length){ if((data||[]).length){$('#app').innerHTML='<div class="card"><h2>Akses dinonaktifkan</h2><p class="muted">Akun Anda dinonaktifkan oleh owner. Hubungi owner usaha.</p></div>';return} return viewOnboard();}
+  let saved=null;try{saved=localStorage.getItem('okp_biz')}catch(e){}
+  const m=S.mems.find(x=>x.business_id===saved)||S.mems[0];
+  await selectBiz(m.business_id);
+}
+async function selectBiz(id){
+  const m=S.mems.find(x=>x.business_id===id);S.biz=m.businesses;S.role=m.role;S.me=m.display_name;
+  try{localStorage.setItem('okp_biz',id)}catch(e){}
+  $('#bizName').textContent=S.biz.name+(S.mems.length>1?' ▾':'');$('#bizName').onclick=S.mems.length>1?pickBiz:null;
+  S.br=null;await Promise.all([reloadCats(),reloadAccs(),reloadBranches()]);
+  $('#whoami').textContent=S.me+(isOwner()?' · Owner':' · '+(S.branches[0]?S.branches[0].name:'Karyawan'));
+  if(isOwner()){const {data:mm}=await sb.from('members').select('user_id,display_name,role,active,created_at').eq('business_id',id);S.members=mm||[]}
+  else S.members=[{user_id:S.user.id,display_name:S.me}];
+  buildTabs();
+}
+async function reloadBiz(){const {data}=await sb.from('businesses').select('*').eq('id',S.biz.id).single();if(data){S.biz=data;const m=S.mems.find(x=>x.business_id===data.id);if(m)m.businesses=data}}
+const catRank=c=>/^(Ambil uang owner|Setoran modal owner|Lain-lain)/.test(c.name)?1:0;
+async function reloadCats(){const {data}=await sb.from('categories').select('*').eq('business_id',S.biz.id).order('name');S.cats=(data||[]).sort((a,b)=>catRank(a)-catRank(b)||a.name.localeCompare(b.name,'id'))}
+async function reloadBranches(){const {data}=await sb.from('branches').select('*').eq('business_id',S.biz.id).order('created_at');S.branches=data||[]}
+async function reloadAccs(){const {data}=await sb.from('bank_accounts').select('*').eq('business_id',S.biz.id).order('bank_name');S.accs=data||[]}
+async function refreshPending(){if(!isOwner())return;const {count}=await sb.from('transactions').select('id',{count:'exact',head:true}).eq('business_id',S.biz.id).eq('status','pending');S.pend=count||0;
+  const b=document.querySelector('#tabsIn button[data-t="menu"]');if(b){b.querySelector('.badge')?.remove();if(S.pend)b.insertAdjacentHTML('beforeend',`<span class="badge">${S.pend}</span>`)}}
+function pickBiz(){openModal(`<h2>Pilih usaha</h2>${S.mems.map(m=>`<button class="btn sec full" style="margin:4px 0" onclick="closeModal();selectBiz('${m.business_id}')">${esc(m.businesses.name)} · ${m.role==='owner'?'Owner':'Karyawan'}</button>`).join('')}`)}
+const nameOf=uid=>(S.members.find(m=>m.user_id===uid)||{}).display_name||'—';
+const catName=id=>(S.cats.find(c=>c.id===id)||{}).name||'—';
+
+function buildTabs(){
+  const T=isOwner()
+   ?[['dash','🏠','Ringkasan'],['catat','➕','Catat'],['trx','📋','Transaksi'],['tutup','🔒','Tutup Kas'],['menu','☰','Menu']]
+   :[['catat','➕','Catat'],['hari','📋','Hari ini']].concat(S.biz.stock_enabled?[['stok','📦','Stok']]:[]).concat([['tutup','🔒','Tutup Kas']]);
+  $('#tabsIn').innerHTML=T.map(t=>`<button data-t="${t[0]}"><b>${t[1]}</b>${t[2]}</button>`).join('');
+  $('#tabs').classList.remove('hide');
+  document.querySelectorAll('#tabsIn button').forEach(b=>b.onclick=()=>go(b.dataset.t));
+  go(isOwner()?'dash':'catat');refreshPending();
+}
+const MENU_OF={rek:1,setuju:1,utang:1,kasbon:1,lap:1,tim:1,cabang:1,stok:1,wa:1};
+function go(t){S.tab=t;const tabKey=MENU_OF[t]&&isOwner()?'menu':t;document.querySelectorAll('#tabsIn button').forEach(b=>b.classList.toggle('on',b.dataset.t===tabKey));window.scrollTo(0,0);
+  ({dash:viewDash,catat:()=>viewCatat(),trx:viewTrx,tutup:viewTutup,menu:viewMenu,lap:viewLap,tim:viewTim,hari:viewHari,rek:viewRek,setuju:viewSetuju,utang:viewUtang,kasbon:viewKasbon,cabang:viewCabang,stok:viewStok,wa:viewWa})[t]()}
+const backBtnF=()=>isOwner()?`<button class="btn sm sec noprint" onclick="go('menu')">← Menu</button>`:'<span></span>';
+
+/* ---------- MENU ---------- */
+function viewMenu(){
+  const it=[['rek','🏦','Rekening Bank','Saldo & mutasi tiap rekening'],['setuju','✅','Persetujuan','Pengeluaran yang menunggu'],['utang','💳','Piutang & Hutang','Tagihan & kewajiban usaha'],
+    ['kasbon','👷','Kasbon Karyawan','Pinjaman & cicilan karyawan'],['cabang','🏬','Cabang','Kas & kode gabung tiap cabang']].concat(S.biz.stock_enabled?[['stok','📦','Stok Barang','Stok per cabang & stok menipis']]:[]).concat([['wa','📲','Ringkasan WA','Laporan harian otomatis ke WhatsApp'],['lap','📊','Laporan','PDF & Excel'],['tim','⚙️','Tim & Pengaturan','Karyawan, kategori, batas persetujuan']]);
+  $('#app').innerHTML=`<div class="card"><h2>Menu</h2><div class="menu">${it.map(x=>`<button onclick="go('${x[0]}')"><b>${x[1]}</b><span>${x[2]}</span><small>${x[3]}</small>${x[0]==='setuju'&&S.pend?`<span class="badge">${S.pend}</span>`:''}</button>`).join('')}</div></div>`;
+}
+
+/* ---------- CATAT ---------- */
+async function compressImage(file){
+  const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(file)});
+  const max=1280,sc=Math.min(1,max/Math.max(img.width,img.height));
+  const c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+  return await new Promise(r=>c.toBlob(r,'image/jpeg',.72));
+}
+async function uploadProof(file){const blob=await compressImage(file);const path=`${S.biz.id}/${crypto.randomUUID()}.jpg`;
+  const up=await sb.storage.from('proofs').upload(path,blob,{contentType:'image/jpeg'});if(up.error)throw up.error;return path}
+function viewCatat(edit){
+  const t=edit||{direction:'out',method:'tunai'};const owner=isOwner();const linked=edit&&t.source&&t.source!=='manual';
+  const lim=S.biz.approval_limit;
+  const html=`<div class="card"><h2>${edit?'Ubah transaksi':'Catat transaksi'}</h2>
+  ${linked?`<div class="alert i">Transaksi ini dibuat dari menu ${SOURCES[t.source]}. Nominal, tanggal, dan metode diubah dari menu tersebut.</div>`:''}
+  <div class="seg"><button data-d="in" class="in">⬇ Uang masuk</button><button data-d="out" class="out">⬆ Uang keluar</button></div>
+  <label>Nominal (Rp)</label><input id="fAmt" inputmode="numeric" placeholder="0" value="${fmtMoney(t.amount)}" style="font-size:20px;font-weight:700" ${linked?'disabled':''}>
+  <div id="limInfo" class="alert w hide" style="margin-top:8px"></div>
+  ${payPicker('f',{method:t.method,acc:t.bank_account_id,nobr:true})}
+  ${owner&&multiBr()?`<label>Cabang</label><select id="fBr" ${linked?'disabled':''}>${brOptions(t.branch_id||S.br||mainBr())}</select>`:(!owner&&S.branches[0]?`<div class="muted" style="margin-top:6px">Dicatat untuk: <b>${esc(S.branches[0].name)}</b></div>`:'')}
+  <label>Objek transaksi (apa yang dibeli/dijual/dikerjakan)</label><input id="fObj" placeholder="cth. Servis motor pelanggan / Beli stok 10 dus" value="${esc(t.object||'')}">
+  <label>Kategori</label><select id="fCat"></select>
+  <label id="lCp">Dari/kepada siapa (pihak lain)</label><input id="fCp" placeholder="cth. Toko Sumber Rejeki / Pelanggan" value="${esc(t.counterparty||'')}">
+  <label>Siapa yang bertransaksi</label><input id="fActor" placeholder="cth. Budi (teknisi)" value="${esc(t.actor_name||(edit?'':S.me))}">
+  ${owner?`<label>Tanggal</label><input id="fDate" type="date" value="${t.trx_date||today()}" max="${today()}" ${linked?'disabled':''}>`:''}
+  <label>Keterangan (opsional)</label><textarea id="fNote" rows="2">${esc(t.note||'')}</textarea>
+  <label id="lPh">Foto bukti/nota</label><input id="fPh" type="file" accept="image/*" capture="environment">
+  <div id="phInfo" class="muted"></div>
+  <div style="height:12px"></div><button class="btn full" id="fSave">${edit?'Simpan perubahan':'Simpan transaksi'}</button>
+  ${edit?'<div style="height:8px"></div><button class="btn full sec" onclick="closeModal()">Batal</button>':''}</div>`;
+  if(edit)openModal(html);else $('#app').innerHTML=html;
+  if(linked){$('#fMet').disabled=true;$('#fAcc').disabled=true}
+  let dir=t.direction;
+  const needApproval=()=>!owner&&dir==='out'&&lim!=null&&num($('#fAmt').value)>Number(lim);
+  const upd=()=>{const na=needApproval();$('#limInfo').classList.toggle('hide',!na);
+    if(na)$('#limInfo').innerHTML=`Di atas batas ${rp(lim)}: pengeluaran ini <b>diajukan ke owner dulu</b>. Keluarkan uang setelah disetujui. Foto nota bisa dilampirkan nanti di menu Hari ini.`;
+    $('#lPh').textContent='Foto bukti/nota'+(dir==='out'&&!owner&&!t.proof_path&&!na?' (WAJIB)':' (opsional)')};
+  const setDir=d=>{dir=d;document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.d===d));
+    $('#fCat').innerHTML=S.cats.filter(c=>c.direction===d&&(!c.sys||c.id===t.category_id)).map(c=>`<option value="${c.id}" ${t.category_id===c.id?'selected':''}>${esc(c.name)}</option>`).join('');
+    $('#lCp').textContent=d==='in'?'Diterima dari siapa':'Dibayar kepada siapa';upd()};
+  document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{if(!linked)setDir(b.dataset.d)});setDir(dir);
+  bindPayPicker('f');moneyInput($('#fAmt'));$('#fAmt').addEventListener('input',upd);
+  if(!S.accs.length)$('#fAccW').insertAdjacentHTML('beforeend',`<div class="muted">${owner?'Belum ada rekening. Tambahkan di Menu → Rekening Bank.':'Owner belum menambahkan rekening.'}</div>`);
+  if(t.proof_path)$('#phInfo').textContent='Sudah ada foto bukti. Pilih file baru untuk mengganti.';
+  $('#fSave').onclick=async()=>{
+    const amount=num($('#fAmt').value),object=$('#fObj').value.trim(),file=$('#fPh').files[0];
+    if(!amount)return toast('Isi nominal');if(!object)return toast('Isi objek transaksi');
+    if(dir==='out'&&!owner&&!file&&!t.proof_path&&!needApproval())return toast('Foto bukti wajib untuk uang keluar');
+    const btn=$('#fSave');btn.disabled=true;btn.textContent='Menyimpan...';
+    try{
+      let pay;if(!linked)pay=readPay('f');
+      let proof_path=t.proof_path||null;
+      if(file)proof_path=await uploadProof(file);
+      const row={object,category_id:$('#fCat').value||null,counterparty:$('#fCp').value.trim()||null,actor_name:$('#fActor').value.trim()||null,note:$('#fNote').value.trim()||null,proof_path};
+      if(!linked){Object.assign(row,{direction:dir,method:pay.method,bank_account_id:pay.acc,amount});if(owner)row.trx_date=$('#fDate').value||today();if($('#fBr'))row.branch_id=$('#fBr').value}
+      if(!edit)row.business_id=S.biz.id;
+      const r=edit?await sb.from('transactions').update(row).eq('id',t.id).select('status'):await sb.from('transactions').insert(row).select('status');
+      if(r.error)throw r.error;
+      const st=r.data&&r.data[0]&&r.data[0].status;
+      toast(edit?'Perubahan tersimpan':(st==='pending'?'Diajukan ke owner. Tunggu persetujuan sebelum mengeluarkan uang.':'Transaksi tersimpan ✓'),4000);
+      if(edit){closeModal();go(S.tab)}else viewCatat();
+    }catch(e){toast(errMsg(e))}finally{btn.disabled=false;btn.textContent=edit?'Simpan perubahan':'Simpan transaksi'}
+  };
+}
+const statusTag=t=>t.status==='pending'?'<span class="tag w">menunggu persetujuan</span>':(t.status==='rejected'?'<span class="tag out">ditolak</span>':'');
+const srcTag=t=>t.source&&t.source!=='manual'?`<span class="tag p">${SOURCES[t.source]}</span>`:'';
+const methodTxt=t=>METHODS[t.method]+(t.account?' · '+esc(t.account):'');
+
+/* ---------- KARYAWAN: HARI INI ---------- */
+async function viewHari(){
+  $('#app').innerHTML='<div class="card"><h2>Catatan saya hari ini</h2><div id="lst" class="list muted">Memuat...</div></div><p class="muted">Salah catat? Minta owner untuk mengubah atau menghapus. Karyawan tidak bisa mengubah transaksi.</p>';
+  const {data,error}=await sb.from('transactions').select('*').eq('business_id',S.biz.id).eq('trx_date',today()).order('created_at',{ascending:false});
+  if(error)return toast(errMsg(error));S._hari=data;
+  $('#lst').classList.remove('muted');
+  $('#lst').innerHTML=(data||[]).length?data.map(t=>`<div class="it"><div><div><span class="tag ${t.direction}">${t.direction==='in'?'Masuk':'Keluar'}</span> <b>${esc(t.object)}</b> ${statusTag(t)}</div>
+   <div class="muted">${methodTxt(t)} · ${fmtT(t.created_at)}${t.proof_path?' · 📎':''}</div>
+   ${t.review_note?`<div class="muted">Catatan owner: ${esc(t.review_note)}</div>`:''}
+   ${t.direction==='out'&&!t.proof_path?`<button class="btn sm sec" style="margin-top:6px" onclick="pickProof('${t.id}')">📎 Lampirkan nota</button>`:''}</div>
+   <div class="amt ${t.direction}">${t.direction==='in'?'+':'−'}${rp(t.amount)}</div></div>`).join(''):'<p class="muted">Belum ada catatan hari ini.</p>';
+}
+function pickProof(id){const i=document.createElement('input');i.type='file';i.accept='image/*';i.capture='environment';
+  i.onchange=async()=>{if(!i.files[0])return;toast('Mengunggah...');try{const p=await uploadProof(i.files[0]);const {error}=await sb.rpc('attach_proof',{tid:id,path:p});if(error)throw error;toast('Nota terlampir ✓');go(S.tab)}catch(e){toast(errMsg(e))}};i.click()}
+
+/* ---------- OWNER: RINGKASAN ---------- */
+async function viewDash(){
+  const d=today();
+  $('#app').innerHTML=`${brBar('viewDash()')}<div id="pendBox"></div>
+  <div class="card"><div class="muted">${fmtD(d)}${S.br?' · '+esc(brName(S.br)):(multiBr()?' · semua cabang':'')}</div><h2>Posisi kas tunai hari ini</h2><div id="cash">Memuat...</div></div>
+  <div id="lowBox"></div>
+  <div class="card"><div class="row sp"><h2>Saldo rekening</h2><button class="btn sm sec" onclick="go('rek')">Detail</button></div><div id="accs" class="muted">Memuat...</div></div>
+  <div class="card"><div class="row sp"><h2>Piutang & hutang</h2><button class="btn sm sec" onclick="go('utang')">Detail</button></div><div id="debt" class="muted">Memuat...</div></div>
+  <div class="card"><h2>Transaksi terakhir hari ini</h2><div id="last" class="list"></div></div>`;
+  let txq=sb.from('transactions').select('*').eq('business_id',S.biz.id).eq('trx_date',d).order('created_at',{ascending:false});if(S.br)txq=txq.eq('branch_id',S.br);
+  const perBr=!S.br&&multiBr()?actBr():[];
+  const [{data:cp,error:e1},{data:tx},{data:cls},{data:led},{data:ds},{data:pend},lv,...pb]=await Promise.all([
+    sb.rpc('owner_cash_position',{bid:S.biz.id,d,br:S.br}),txq,
+    sb.from('cash_closings').select('*').eq('business_id',S.biz.id).eq('close_date',d),
+    sb.rpc('account_ledger',{bid:S.biz.id,f:d,t:d}),
+    sb.from('debt_status').select('*').eq('business_id',S.biz.id).eq('cancelled',false).gt('remaining',0),
+    sb.from('transactions').select('id,amount').eq('business_id',S.biz.id).eq('status','pending'),
+    S.biz.stock_enabled?sb.rpc('stock_levels',{bid:S.biz.id,br:S.br}):Promise.resolve({data:[]}),
+    ...perBr.map(b=>sb.rpc('owner_cash_position',{bid:S.biz.id,d,br:b.id}))]);
+  if(e1)return toast(errMsg(e1));
+  S.pend=(pend||[]).length;refreshPending();
+  if(S.pend)$('#pendBox').innerHTML=`<div class="card" style="border-color:var(--a)"><div class="row sp"><div><b>${S.pend} pengeluaran menunggu persetujuan</b><div class="muted">Total ${rp(pend.reduce((s,x)=>s+Number(x.amount),0))}</div></div><button class="btn" onclick="go('setuju')">Periksa</button></div></div>`;
+  const c=cp[0];
+  let closeInfo;
+  if(perBr.length){closeInfo=`<div class="tblw"><table><tr><th>Cabang</th><th class="n">Seharusnya</th><th>Tutup kas</th></tr>${perBr.map((b,i)=>{const x=pb[i].data[0],k=(cls||[]).find(y=>y.branch_id===b.id);const df=k?Number(k.diff):0;
+      return `<tr><td>${esc(b.name)}</td><td class="n">${rp(x.expected)}</td><td>${k?`<span class="tag ${df===0?'in':(df<0?'out':'w')}">${df===0?'cocok':(df<0?'kurang '+rp(-df):'lebih '+rp(df))}</span>`:'<span class="tag w">belum</span>'}</td></tr>`}).join('')}</table></div>`}
+  else{const br=S.br||mainBr();const k=(cls||[]).find(y=>y.branch_id===br);closeInfo=k?closingBadge(k):'<div class="alert w">Kas hari ini belum ditutup.</div>'}
+  $('#cash').innerHTML=`<div class="grid2"><div class="kpi"><div class="l">Saldo awal</div><div class="v">${rp(c.opening)}</div></div>
+   <div class="kpi"><div class="l">Seharusnya di laci</div><div class="v" style="color:var(--p)">${rp(c.expected)}</div></div>
+   <div class="kpi"><div class="l">Masuk tunai</div><div class="v amt in">+${rp(c.cash_in)}</div></div>
+   <div class="kpi"><div class="l">Keluar tunai</div><div class="v amt out">−${rp(c.cash_out)}</div></div></div>
+   <p class="muted">Saldo awal + Masuk tunai − Keluar tunai = Saldo akhir.</p>${closeInfo}`;
+  const low=(lv.data||[]).filter(x=>x.active&&Number(x.min_stock)>0&&Number(x.qty)<=Number(x.min_stock));
+  if(low.length)$('#lowBox').innerHTML=`<div class="card" style="border-color:var(--a)"><div class="row sp"><h2>Stok menipis (${low.length})</h2><button class="btn sm sec" onclick="go('stok')">Stok</button></div>
+   <div class="list">${low.slice(0,6).map(x=>`<div class="it"><div><b>${esc(x.name)}</b>${multiBr()?'<div class="muted">'+esc(x.branch_name)+'</div>':''}</div><div><span class="tag ${Number(x.qty)<=0?'out':'w'}">${fmtQty(x.qty)} ${esc(x.unit)}</span> <span class="muted">min ${fmtQty(x.min_stock)}</span></div></div>`).join('')}</div></div>`;
+  const act=(led||[]).filter(a=>a.active);const totAcc=act.reduce((s,a)=>s+Number(a.closing),0);
+  $('#accs').classList.remove('muted');
+  $('#accs').innerHTML=act.length?`<table>${act.map(a=>`<tr><td>${esc(a.bank_name)}${a.account_no?' <span class="muted">••'+esc(last4(a.account_no))+'</span>':''}<div class="muted">hari ini +${rp(a.money_in)} / −${rp(a.money_out)}</div></td><td class="n"><b>${rp(a.closing)}</b></td></tr>`).join('')}
+    <tr><td><b>Total rekening</b></td><td class="n"><b>${rp(totAcc)}</b></td></tr><tr><td><b>Total uang (tunai${S.br?' cabang ini':''} + rekening)</b></td><td class="n"><b style="color:var(--p)">${rp(totAcc+Number(c.expected))}</b></td></tr></table>`
+   :'<p class="muted">Belum ada rekening. <a href="#" onclick="go(\'rek\');return false">Tambah rekening</a> untuk melihat saldo bank & e-wallet di sini.</p>';
+  const pi=(ds||[]).filter(x=>x.kind==='piutang'),hu=(ds||[]).filter(x=>x.kind==='hutang');
+  const late=a=>a.filter(x=>x.due_date&&x.due_date<d).length;
+  $('#debt').classList.remove('muted');
+  $('#debt').innerHTML=`<div class="grid2"><div class="kpi"><div class="l">Piutang belum diterima</div><div class="v amt in">${rp(pi.reduce((s,x)=>s+Number(x.remaining),0))}</div><div class="muted">${pi.length} catatan${late(pi)?` · <b style="color:var(--r)">${late(pi)} lewat jatuh tempo</b>`:''}</div></div>
+   <div class="kpi"><div class="l">Hutang belum dibayar</div><div class="v amt out">${rp(hu.reduce((s,x)=>s+Number(x.remaining),0))}</div><div class="muted">${hu.length} catatan${late(hu)?` · <b style="color:var(--r)">${late(hu)} lewat jatuh tempo</b>`:''}</div></div></div>`;
+  $('#last').innerHTML=(tx||[]).slice(0,8).map(t=>`<div class="it"><div><div><span class="tag ${t.direction}">${t.direction==='in'?'Masuk':'Keluar'}</span> <b>${esc(t.object)}</b> ${statusTag(t)} ${srcTag(t)}</div>
+    <div class="muted">${methodTxt(t)} · ${fmtT(t.created_at)} · oleh ${esc(nameOf(t.recorded_by))}${multiBr()&&!S.br?' · '+esc(brName(t.branch_id)):''}${t.proof_path?' · 📎':''}</div></div>
+    <div class="amt ${t.direction}">${t.direction==='in'?'+':'−'}${rp(t.amount)}</div></div>`).join('')||'<p class="muted">Belum ada transaksi hari ini.</p>';
+}
+function closingBadge(c){const d=Number(c.diff);const cls=d===0?'ok':(d<0?'e':'w');
+  return `<div class="alert ${cls}">Kas ditutup ${fmtT(c.closed_at)} oleh ${esc(nameOf(c.closed_by))}. Uang fisik ${rp(c.counted)} · ${d===0?'COCOK ✓':(d<0?'KURANG '+rp(-d):'LEBIH '+rp(d))}</div>`}
+const fmtQty=v=>Number(v||0).toLocaleString('id-ID',{maximumFractionDigits:2});
+
+/* ---------- OWNER: TRANSAKSI ---------- */
+async function viewTrx(){
+  const d=today();
+  $('#app').innerHTML=`<div class="card noprint"><h2>Semua transaksi</h2>
+   <div class="grid2"><div><label>Dari</label><input type="date" id="tF" value="${addDays(d,-6)}"></div><div><label>Sampai</label><input type="date" id="tT" value="${d}"></div></div>
+   <div class="grid2"><div><label>Metode</label><select id="tM"><option value="">Semua</option>${methodOptions('')}</select></div>
+   <div><label>Rekening</label><select id="tA"><option value="">Semua</option>${S.accs.map(a=>`<option value="${a.id}">${esc(accLabel(a))}</option>`).join('')}</select></div></div>
+   <div class="grid2"><div><label>Pencatat</label><select id="tU"><option value="">Semua</option>${S.members.map(m=>`<option value="${m.user_id}">${esc(m.display_name)}</option>`).join('')}</select></div>
+   ${multiBr()?`<div><label>Cabang</label><select id="tB">${brOptions(S.br,true)}</select></div>`:''}
+   <div><label>Status</label><select id="tS"><option value="">Semua</option><option value="approved">Tercatat</option><option value="pending">Menunggu persetujuan</option><option value="rejected">Ditolak</option></select></div></div>
+   <div style="height:10px"></div><div class="row wrapf"><button class="btn" id="tGo">Tampilkan</button><button class="btn sec" id="tAud">Riwayat perubahan</button></div></div>
+   <div class="card"><div id="tSum" class="muted"></div><div id="tL" class="list"></div></div>`;
+  $('#tGo').onclick=loadTrx;$('#tAud').onclick=viewAudit;loadTrx();
+}
+function trxFull(t){return `<div class="it"><div style="min-width:0"><div><span class="tag ${t.direction}">${t.direction==='in'?'Masuk':'Keluar'}</span> <b>${esc(t.object)}</b> ${statusTag(t)} ${srcTag(t)}</div>
+   <div class="muted">${fmtD(t.trx_date)} · ${methodTxt(t)} · ${esc(catName(t.category_id))}${multiBr()?' · 🏬 '+esc(brName(t.branch_id)):''}</div>
+   <div class="muted">${t.direction==='in'?'Dari':'Kepada'}: ${esc(t.counterparty||'—')} · Oleh: ${esc(t.actor_name||'—')} · Dicatat: ${esc(nameOf(t.recorded_by))}${t.updated_at?' · <span class="tag w">diubah</span>':''}</div>
+   ${t.note?`<div class="muted">📝 ${esc(t.note)}</div>`:''}${t.review_note?`<div class="muted">Catatan persetujuan: ${esc(t.review_note)}</div>`:''}
+   <div class="row wrapf" style="margin-top:6px">${t.proof_path?`<button class="btn sm sec" onclick="showProof('${t.proof_path}')">📎 Bukti</button>`:(t.direction==='out'&&t.source==='manual'?'<span class="tag w">tanpa bukti</span>':'')}
+   ${t.status==='pending'?`<button class="btn sm grn" onclick="review('${t.id}',true)">Setujui</button><button class="btn sm red" onclick="review('${t.id}',false)">Tolak</button>`:''}
+   ${t.method!=='tunai'&&t.status==='approved'?`<button class="btn sm ${t.reconciled?'':'sec'}" onclick="toggleRec('${t.id}',${!t.reconciled})">${t.reconciled?'✓ Cocok mutasi':'Tandai cocok mutasi'}</button>`:''}
+   <button class="btn sm sec" onclick="editTrx('${t.id}')">Ubah</button><button class="btn sm sec" style="color:var(--r)" onclick="delTrx('${t.id}')">Hapus</button></div></div>
+   <div class="amt ${t.direction}" style="${t.status!=='approved'?'opacity:.55;text-decoration:'+(t.status==='rejected'?'line-through':'none'):''}">${t.direction==='in'?'+':'−'}${rp(t.amount)}</div></div>`}
+async function loadTrx(){
+  let q=sb.from('transactions').select('*').eq('business_id',S.biz.id).gte('trx_date',$('#tF').value).lte('trx_date',$('#tT').value).order('trx_date',{ascending:false}).order('created_at',{ascending:false});
+  if($('#tM').value)q=q.eq('method',$('#tM').value);if($('#tU').value)q=q.eq('recorded_by',$('#tU').value);if($('#tA').value)q=q.eq('bank_account_id',$('#tA').value);if($('#tS').value)q=q.eq('status',$('#tS').value);if($('#tB')&&$('#tB').value)q=q.eq('branch_id',$('#tB').value);
+  const {data,error}=await q;if(error)return toast(errMsg(error));S._trx=data;
+  const ok=data.filter(t=>t.status==='approved'&&!t.transfer_group);
+  $('#tSum').innerHTML=data.length?`${data.length} transaksi · masuk ${rp(ok.filter(t=>t.direction==='in').reduce((s,t)=>s+Number(t.amount),0))} · keluar ${rp(ok.filter(t=>t.direction==='out').reduce((s,t)=>s+Number(t.amount),0))} <span class="muted">(tanpa pindah dana & yang belum disetujui)</span>`:'';
+  $('#tL').innerHTML=data.length?data.map(trxFull).join(''):'<p class="muted">Tidak ada transaksi pada filter ini.</p>';
+}
+async function showProof(p){const {data,error}=await sb.storage.from('proofs').createSignedUrl(p,300);if(error)return toast(errMsg(error));
+  openModal(`<h2>Foto bukti</h2><img class="photo" src="${data.signedUrl}" alt="Foto bukti transaksi"><div style="height:10px"></div><button class="btn full sec" onclick="closeModal()">Tutup</button>`)}
+const findTrx=id=>(S._trx||[]).concat(S._pendList||[],S._mut||[]).find(t=>t.id===id);
+function editTrx(id){viewCatat(findTrx(id))}
+async function delTrx(id){const t=findTrx(id);if(!t)return;
+  if(t.source==='pindah'){if(!await confirmBox('Hapus pindah dana ini? Kedua sisi (keluar & masuk) ikut terhapus.','Hapus'))return;
+    const {error}=await sb.rpc('delete_transfer',{bid:S.biz.id,g:t.transfer_group});if(error)return toast(errMsg(error));toast('Pindah dana dihapus');return go(S.tab)}
+  if(t.source!=='manual')return toast(`Transaksi ini dari menu ${SOURCES[t.source]}. Hapus dari menu tersebut agar saldonya tetap benar.`,4500);
+  if(!await confirmBox('Hapus transaksi ini? Penghapusan tetap tercatat di riwayat perubahan.','Hapus'))return;
+  const {error}=await sb.from('transactions').delete().eq('id',id);if(error)return toast(errMsg(error));toast('Transaksi dihapus');go(S.tab)}
+async function toggleRec(id,v){const {error}=await sb.from('transactions').update({reconciled:v}).eq('id',id);if(error)return toast(errMsg(error));
+  const t=findTrx(id);if(t)t.reconciled=v;if(S.tab==='rek'&&S._mutAcc)return showMutasi(S._mutAcc);go(S.tab)}
+async function review(id,approve){const t=findTrx(id);
+  openModal(`<h2>${approve?'Setujui':'Tolak'} pengeluaran</h2><p><b>${esc(t?t.object:'')}</b> · ${rp(t?t.amount:0)}<br><span class="muted">Diajukan ${t?esc(nameOf(t.recorded_by)):''}</span></p>
+   ${approve?'<p class="muted">Setelah disetujui, pengeluaran masuk ke buku kas'+(t&&t.trx_date<today()?' dengan tanggal hari ini':'')+'.</p>':'<p class="muted">Pengeluaran yang ditolak tidak dihitung di kas maupun laporan.</p>'}
+   <label>Catatan untuk karyawan (opsional)</label><input id="rvNote" placeholder="${approve?'cth. OK, minta nota ya':'cth. Tunda dulu, stok masih ada'}">
+   <div style="height:12px"></div><div class="row" style="justify-content:flex-end"><button class="btn sec" onclick="closeModal()">Batal</button><button class="btn ${approve?'grn':'red'}" id="rvOk">${approve?'Setujui':'Tolak'}</button></div>`);
+  $('#rvOk').onclick=async()=>{const {data,error}=await sb.rpc('review_trx',{tid:id,approve,rnote:$('#rvNote').value.trim()||null});if(error)return toast(errMsg(error));closeModal();toast(data);refreshPending();go(S.tab)}}
+async function viewAudit(){
+  const {data,error}=await sb.from('audit_log').select('*').eq('business_id',S.biz.id).order('at',{ascending:false}).limit(100);
+  if(error)return toast(errMsg(error));
+  const desc=a=>{const o=a.old_data,n=a.new_data;
+    if(a.action==='ubah'){const ch=['amount','object','method','account','direction','trx_date','counterparty','actor_name','category_id','note','reconciled','proof_path'].filter(k=>JSON.stringify(o[k])!==JSON.stringify(n[k]));
+      return ch.map(k=>k==='proof_path'?'foto bukti diganti/ditambah':`${k==='amount'?'nominal':k}: ${k==='amount'?rp(o[k]):esc(o[k]??'—')} → ${k==='amount'?rp(n[k]):esc(n[k]??'—')}`).join('<br>')||'—'}
+    if(a.action==='buka ulang kas')return `Tutup kas ${fmtD(o.close_date)} dibuka ulang (uang fisik tercatat ${rp(o.counted)})`;
+    if(a.action==='hapus kasbon')return `Kasbon ${esc(o.employee_name)} · ${o.kind} ${rp(o.amount)}`;
+    if(a.action==='hapus pembayaran')return `Pembayaran ${rp(o.amount)} tanggal ${fmtDs(o.pay_date)}`;
+    if(/^hapus (piutang|hutang)$/.test(a.action))return `${esc(o.party_name)} · ${esc(o.description)} · ${rp(o.amount)}`;
+    const x=n||o;return `${esc(x.object)} · ${rp(x.amount)} · ${METHODS[x.method]||''}${x.review_note?' · '+esc(x.review_note):''}`};
+  const cls=a=>a==='tambah'||a==='disetujui'?'in':(/hapus|ditolak/.test(a)?'out':'w');
+  openModal(`<h2>Riwayat perubahan</h2><p class="muted">100 aktivitas terakhir. Riwayat tidak bisa dihapus.</p><div class="list">${data.map(a=>`<div class="it"><div><span class="tag ${cls(a.action)}">${esc(a.action)}</span> <span class="muted">${fmtT(a.at)} · ${esc(nameOf(a.by_user))}</span><div style="font-size:13px;margin-top:4px">${desc(a)}</div></div></div>`).join('')||'<p class="muted">Belum ada aktivitas.</p>'}</div><button class="btn full sec" onclick="closeModal()">Tutup</button>`)
+}
+
+/* ---------- PERSETUJUAN ---------- */
+async function viewSetuju(){
+  const lim=S.biz.approval_limit;
+  $('#app').innerHTML=`<div class="row sp">${backBtnF()}</div><div class="card"><h2>Persetujuan pengeluaran</h2>
+   <p class="muted">${lim==null?'Batas persetujuan belum aktif: semua pengeluaran karyawan langsung tercatat.':`Pengeluaran karyawan di atas <b>${rp(lim)}</b> menunggu persetujuan Anda dan belum dihitung di kas.`}</p>
+   <div class="grid2"><input id="limV" inputmode="numeric" placeholder="Kosongkan = tidak aktif" value="${fmtMoney(lim)}"><button class="btn sec" id="limSave">Simpan batas</button></div></div>
+   <div class="card"><h2>Menunggu</h2><div id="pl" class="list muted">Memuat...</div></div>
+   <div class="card"><h2>Diproses 30 hari terakhir</h2><div id="pd" class="list muted">Memuat...</div></div>`;
+  moneyInput($('#limV'));
+  $('#limSave').onclick=async()=>{const v=$('#limV').value.trim();const {error}=await sb.from('businesses').update({approval_limit:v===''?null:num(v)}).eq('id',S.biz.id);if(error)return toast(errMsg(error));await reloadBiz();toast('Batas persetujuan disimpan');viewSetuju()};
+  const [{data:p},{data:d}]=await Promise.all([
+    sb.from('transactions').select('*').eq('business_id',S.biz.id).eq('status','pending').order('created_at'),
+    sb.from('transactions').select('*').eq('business_id',S.biz.id).not('reviewed_at','is',null).gte('reviewed_at',addDays(today(),-30)).order('reviewed_at',{ascending:false}).limit(50)]);
+  S._pendList=(p||[]).concat(d||[]);S.pend=(p||[]).length;refreshPending();
+  $('#pl').classList.remove('muted');$('#pd').classList.remove('muted');
+  $('#pl').innerHTML=(p||[]).length?p.map(trxFull).join(''):'<p class="muted">Tidak ada pengeluaran yang menunggu.</p>';
+  $('#pd').innerHTML=(d||[]).length?d.map(t=>`<div class="it"><div><b>${esc(t.object)}</b> <span class="tag ${t.status==='approved'?'in':'out'}">${t.status==='approved'?'disetujui':'ditolak'}</span><div class="muted">${esc(nameOf(t.recorded_by))} · diproses ${fmtT(t.reviewed_at)}${t.review_note?' · '+esc(t.review_note):''}</div></div><div class="amt out">${rp(t.amount)}</div></div>`).join(''):'<p class="muted">Belum ada.</p>';
+}
+
+/* ---------- TUTUP KAS ---------- */
+async function viewTutup(){
+  const d=today(),owner=isOwner();const br=owner?(S.br||mainBr()):null;
+  $('#app').innerHTML=`<div class="card"><h2>Tutup kas hari ini</h2><p class="muted">${fmtD(d)}. Hitung semua uang tunai di laci/brankas, lalu ketik jumlahnya. ${owner?'':'Angka seharusnya tidak ditampilkan agar hitungan jujur.'}</p>
+   ${owner&&multiBr()?`<label>Cabang</label><select id="cBr">${brOptions(br)}</select>`:(!owner&&S.branches[0]?`<p><b>${esc(S.branches[0].name)}</b></p>`:'')}
+   <label>Jumlah uang fisik (Rp)</label><input id="cAmt" inputmode="numeric" placeholder="0" style="font-size:22px;font-weight:700">
+   <label>Catatan (opsional)</label><input id="cNote" placeholder="cth. ada uang palsu 50rb">
+   <div style="height:12px"></div><button class="btn full" id="cBtn">🔒 Tutup kas</button></div>
+   ${owner?'<div class="card"><h2>Riwayat tutup kas</h2><div id="cl">Memuat...</div></div>':''}`;
+  moneyInput($('#cAmt'));
+  $('#cBtn').onclick=async()=>{const v=$('#cAmt').value;if(v==='')return toast('Isi jumlah uang fisik');const b=$('#cBr')?$('#cBr').value:br;
+    if(!await confirmBox(`Tutup kas${b&&multiBr()?' '+esc(brName(b)):''} dengan uang fisik <b>${rp(num(v))}</b>? Setelah ditutup, transaksi tunai hari ini terkunci untuk karyawan.`,'Tutup kas',false))return;
+    const {data,error}=await sb.rpc('close_cash',{bid:S.biz.id,d,counted:num(v),note:$('#cNote').value.trim()||null,br:b});
+    if(error)return toast(errMsg(error));toast(data);viewTutup()};
+  if(!owner)return;
+  let q=sb.from('cash_closings').select('*').eq('business_id',S.biz.id).order('close_date',{ascending:false}).limit(90);if(S.br)q=q.eq('branch_id',S.br);
+  const {data}=await q;const mb=multiBr();
+  $('#cl').innerHTML=(data||[]).length?`<div class="tblw"><table><tr><th>Tanggal</th><th class="n">Seharusnya</th><th class="n">Fisik</th><th class="n">Selisih</th><th></th></tr>${data.map(c=>`<tr><td>${fmtDs(c.close_date)}${mb?'<div><b>'+esc(brName(c.branch_id))+'</b></div>':''}<div class="muted">${esc(nameOf(c.closed_by))}${c.note?' · '+esc(c.note):''}</div></td><td class="n">${rp(c.expected)}</td><td class="n">${rp(c.counted)}</td><td class="n" style="font-weight:700;color:${Number(c.diff)===0?'var(--g)':(Number(c.diff)<0?'var(--r)':'var(--a)')}">${Number(c.diff)===0?'0 ✓':rp(c.diff)}</td><td><button class="btn sm sec" onclick="reopen('${c.close_date}','${c.branch_id}')">Buka ulang</button></td></tr>`).join('')}</table></div>`:'<p class="muted">Belum ada tutup kas.</p>';
+}
+async function reopen(d,br){if(!await confirmBox(`Buka ulang tutup kas ${multiBr()?esc(brName(br))+' ':''}${fmtD(d)}? Tindakan ini tercatat di riwayat.`,'Buka ulang'))return;
+  const {data,error}=await sb.rpc('reopen_cash',{bid:S.biz.id,d,br});if(error)return toast(errMsg(error));toast(data);viewTutup()}
+
+/* ---------- REKENING BANK ---------- */
+async function viewRek(){
+  const d=today(),first=d.slice(0,8)+'01';
+  $('#app').innerHTML=`<div class="row sp">${backBtnF()}<div class="row"><button class="btn sm sec" onclick="formTransfer()">⇄ Pindah dana</button><button class="btn sm" onclick="formAcc()">+ Rekening</button></div></div>
+   <div class="card noprint"><h2>Rekening bank & e-wallet</h2><p class="muted">Saldo awal + uang masuk − uang keluar = saldo akhir, per rekening. Transaksi non-tunai yang memilih rekening otomatis masuk ke sini.</p>
+   <div class="grid2"><div><label>Dari</label><input type="date" id="kF" value="${first}"></div><div><label>Sampai</label><input type="date" id="kT" value="${d}"></div></div>
+   <div style="height:10px"></div><button class="btn" id="kGo">Tampilkan</button></div><div id="kL"></div>`;
+  $('#kGo').onclick=loadRek;loadRek();
+}
+async function loadRek(){
+  const F=$('#kF').value,T=$('#kT').value;if(F>T)return toast('Tanggal awal melewati tanggal akhir');
+  const {data,error}=await sb.rpc('account_ledger',{bid:S.biz.id,f:F,t:T});if(error)return toast(errMsg(error));S._led=data;
+  if(!data.length){$('#kL').innerHTML='<div class="card"><p>Belum ada rekening.</p><p class="muted">Tambahkan rekening bank (BCA, BRI, Mandiri, dll.) atau e-wallet (DANA, OVO, GoPay) beserta saldo awalnya.</p><button class="btn" onclick="formAcc()">+ Tambah rekening</button></div>';return}
+  const act=data.filter(a=>a.active);const sum=k=>act.reduce((s,a)=>s+Number(a[k]),0);
+  $('#kL').innerHTML=`<div class="card"><div class="muted">${fmtDs(F)} – ${fmtDs(T)}</div><div class="grid2" style="margin-top:6px">
+   <div class="kpi"><div class="l">Saldo awal semua rekening</div><div class="v">${rp(sum('opening'))}</div></div><div class="kpi"><div class="l">Saldo akhir semua rekening</div><div class="v" style="color:var(--p)">${rp(sum('closing'))}</div></div>
+   <div class="kpi"><div class="l">Total masuk</div><div class="v amt in">+${rp(sum('money_in'))}</div></div><div class="kpi"><div class="l">Total keluar</div><div class="v amt out">−${rp(sum('money_out'))}</div></div></div></div>
+   ${data.map(a=>`<div class="card acc" style="${a.active?'':'opacity:.6'}"><div class="row sp"><div><b>${esc(a.bank_name)}</b> ${a.active?'':'<span class="tag x">nonaktif</span>'}
+     <div class="muted">${a.account_no?esc(a.account_no):'tanpa nomor'}${a.holder_name?' · a.n. '+esc(a.holder_name):''}</div>${a.note?`<div class="muted">${esc(a.note)}</div>`:''}</div>
+     <div style="text-align:right"><div class="muted">Saldo akhir</div><b style="font-size:18px">${rp(a.closing)}</b></div></div>
+     <table style="margin-top:8px"><tr><td>Saldo awal</td><td class="n">${rp(a.opening)}</td></tr><tr><td>Uang masuk</td><td class="n amt in">+${rp(a.money_in)}</td></tr><tr><td>Uang keluar</td><td class="n amt out">−${rp(a.money_out)}</td></tr><tr><td><b>Saldo akhir</b></td><td class="n"><b>${rp(a.closing)}</b></td></tr></table>
+     ${a.unreconciled?`<div class="muted" style="margin-top:6px">${a.unreconciled} transaksi belum dicocokkan dengan mutasi bank</div>`:''}
+     <div class="row wrapf" style="margin-top:8px"><button class="btn sm" onclick="showMutasi('${a.account_id}')">Mutasi</button><button class="btn sm sec" onclick="formAcc('${a.account_id}')">Ubah</button>
+     <button class="btn sm sec" onclick="toggleAcc('${a.account_id}',${!a.active})">${a.active?'Nonaktifkan':'Aktifkan'}</button></div></div>`).join('')}`;
+}
+function formAcc(id){const a=id?accById(id):{opening_date:today()};
+  openModal(`<h2>${id?'Ubah rekening':'Tambah rekening'}</h2>
+   <label>Nama bank / e-wallet</label><input id="bN" placeholder="cth. BCA, BRI, Mandiri, DANA" value="${esc(a.bank_name||'')}" maxlength="40">
+   <label>Nomor rekening / nomor HP e-wallet</label><input id="bNo" inputmode="numeric" placeholder="cth. 1234567890" value="${esc(a.account_no||'')}" maxlength="30">
+   <label>Nama di rekening</label><input id="bH" placeholder="cth. PT Maju Jaya / Emir" value="${esc(a.holder_name||'')}" maxlength="60">
+   <label>Keterangan (opsional)</label><input id="bNote" placeholder="cth. Rekening operasional / khusus gaji" value="${esc(a.note||'')}" maxlength="100">
+   <div class="grid2"><div><label>Saldo awal (Rp)</label><input id="bO" inputmode="numeric" placeholder="0" value="${fmtMoney(a.opening_balance)}"></div>
+   <div><label>Per tanggal</label><input id="bD" type="date" value="${a.opening_date}" max="${today()}"></div></div>
+   <p class="muted">Isi saldo sesuai saldo bank pada tanggal tersebut. Transaksi sebelum tanggal ini tidak dihitung di saldo rekening.</p>
+   <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn sec" onclick="closeModal()">Batal</button><button class="btn" id="bSave">Simpan</button></div>`);
+  moneyInput($('#bO'));
+  $('#bSave').onclick=async()=>{const row={bank_name:$('#bN').value.trim(),account_no:$('#bNo').value.trim()||null,holder_name:$('#bH').value.trim()||null,note:$('#bNote').value.trim()||null,opening_balance:num($('#bO').value),opening_date:$('#bD').value||today()};
+    if(!row.bank_name)return toast('Isi nama bank / e-wallet');
+    const r=id?await sb.from('bank_accounts').update(row).eq('id',id):await sb.from('bank_accounts').insert({...row,business_id:S.biz.id});
+    if(r.error)return toast(errMsg(r.error));await reloadAccs();closeModal();toast('Rekening tersimpan');if(S.tab==='rek')loadRek()}}
+async function toggleAcc(id,v){if(!v&&!await confirmBox('Nonaktifkan rekening ini? Riwayatnya tetap ada, tetapi rekening tidak bisa dipilih untuk transaksi baru.','Nonaktifkan'))return;
+  const {error}=await sb.from('bank_accounts').update({active:v}).eq('id',id);if(error)return toast(errMsg(error));await reloadAccs();loadRek()}
+async function showMutasi(id){S._mutAcc=id;const a=accById(id);const F=$('#kF')?$('#kF').value:today().slice(0,8)+'01',T=$('#kT')?$('#kT').value:today();
+  const {data,error}=await sb.from('transactions').select('*').eq('bank_account_id',id).eq('status','approved').gte('trx_date',F).lte('trx_date',T).order('trx_date').order('created_at');if(error)return toast(errMsg(error));
+  S._mut=data;const L=(S._led||[]).find(x=>x.account_id===id);let bal=L?Number(L.opening):0;
+  openModal(`<h2>Mutasi ${esc(accLabel(a))}</h2><div class="muted">${fmtDs(F)} – ${fmtDs(T)} · saldo awal ${rp(bal)}</div>
+   <div class="list">${data.map(t=>{bal+=t.direction==='in'?Number(t.amount):-Number(t.amount);return `<div class="it"><div style="min-width:0"><div class="muted">${fmtDs(t.trx_date)}</div><b>${esc(t.object)}</b>${t.counterparty?'<div class="muted">'+esc(t.counterparty)+'</div>':''}${t.note?'<div class="muted">'+esc(t.note)+'</div>':''}
+    <button class="btn sm ${t.reconciled?'grn':'sec'}" style="margin-top:4px" onclick="toggleRec('${t.id}',${!t.reconciled})">${t.reconciled?'✓ Cocok mutasi':'Tandai cocok mutasi'}</button></div>
+    <div style="text-align:right"><div class="amt ${t.direction}">${t.direction==='in'?'+':'−'}${rp(t.amount)}</div><div class="muted">saldo ${rp(bal)}</div></div></div>`}).join('')||'<p class="muted">Tidak ada transaksi.</p>'}</div>
+   <div class="row sp" style="padding:8px 0;border-top:2px solid var(--b)"><b>Saldo akhir</b><b>${rp(bal)}</b></div>
+   <p class="muted">Tekan "cek" bila transaksi sudah sesuai mutasi di aplikasi bank.</p><button class="btn full sec" onclick="closeModal();S._mutAcc=null;loadRek()">Tutup</button>`)}
+function formTransfer(){const accs=S.accs.filter(a=>a.active);if(!accs.length&&!multiBr())return toast('Tambahkan rekening atau cabang dulu');
+  const opts=sel=>actBr().map(b=>`<option value="br:${b.id}" ${'br:'+b.id===sel?'selected':''}>Kas tunai${multiBr()?' — '+esc(b.name):' (laci/brankas)'}</option>`).join('')+accs.map(a=>`<option value="acc:${a.id}" ${'acc:'+a.id===sel?'selected':''}>${esc(accLabel(a))}</option>`).join('');
+  const from='br:'+(S.br||mainBr()),to=accs[0]?'acc:'+accs[0].id:'br:'+actBr()[1].id;
+  openModal(`<h2>Pindah dana</h2><p class="muted">Contoh: setor tunai ke bank, tarik tunai, kirim modal ke cabang, atau pindah antar rekening. Tidak dihitung sebagai pemasukan/pengeluaran usaha.</p>
+   <label>Dari</label><select id="pFrom">${opts(from)}</select><label>Ke</label><select id="pTo">${opts(to)}</select>
+   <div class="grid2"><div><label>Nominal (Rp)</label><input id="pAmt" inputmode="numeric" placeholder="0"></div><div><label>Tanggal</label><input id="pD" type="date" value="${today()}" max="${today()}"></div></div>
+   <label>Keterangan (opsional)</label><input id="pNote" placeholder="cth. Setor omzet hari ini">
+   <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Batal</button><button class="btn" id="pOk">Simpan</button></div>`);
+  moneyInput($('#pAmt'));
+  const parse=v=>{const [k,id]=v.split(':');return k==='acc'?{acc:id,br:null}:{acc:null,br:id}};
+  $('#pOk').onclick=async()=>{const amt=num($('#pAmt').value);if(!amt)return toast('Isi nominal');if($('#pFrom').value===$('#pTo').value)return toast('Asal dan tujuan tidak boleh sama');
+    const f=parse($('#pFrom').value),t=parse($('#pTo').value);
+    const {error}=await sb.rpc('transfer_funds',{bid:S.biz.id,d:$('#pD').value||today(),amt,from_acc:f.acc,to_acc:t.acc,tnote:$('#pNote').value.trim()||null,from_br:f.br,to_br:t.br});
+    if(error)return toast(errMsg(error));closeModal();toast('Pindah dana tersimpan');go(S.tab)}}
+
+/* ---------- PIUTANG & HUTANG ---------- */
+let UK='piutang';
+async function viewUtang(){
+  $('#app').innerHTML=`<div class="row sp">${backBtnF()}<button class="btn sm" onclick="formDebt()">+ Catat ${UK}</button></div>
+   <div class="card"><div class="seg"><button data-k="piutang">Piutang<br><small class="muted">orang berutang ke usaha</small></button><button data-k="hutang">Hutang<br><small class="muted">usaha berutang ke orang</small></button></div>
+   <div class="row" style="margin-top:10px"><label style="margin:0"><input type="checkbox" id="uDone"> tampilkan yang sudah lunas</label></div></div>
+   <div id="uSum"></div><div id="uL" class="muted card">Memuat...</div>`;
+  document.querySelectorAll('[data-k]').forEach(b=>{b.classList.toggle('on',b.dataset.k===UK);b.onclick=()=>{UK=b.dataset.k;viewUtang()}});
+  $('#uDone').onchange=loadUtang;loadUtang();
+}
+function dueTag(x){if(Number(x.remaining)<=0)return '<span class="tag in">lunas</span>';if(x.cancelled)return '<span class="tag x">dibatalkan</span>';if(!x.due_date)return '<span class="tag x">tanpa jatuh tempo</span>';
+  const n=dayDiff(x.due_date,today());return n<0?`<span class="tag out">lewat ${-n} hari</span>`:(n===0?'<span class="tag w">jatuh tempo hari ini</span>':(n<=7?`<span class="tag w">${n} hari lagi</span>`:`<span class="tag x">jatuh tempo ${fmtDs(x.due_date)}</span>`))}
+async function loadUtang(){
+  let q=sb.from('debt_status').select('*').eq('business_id',S.biz.id).eq('kind',UK).eq('cancelled',false).order('due_date',{ascending:true,nullsFirst:false}).order('issue_date');
+  if(!$('#uDone').checked)q=q.gt('remaining',0);
+  const {data,error}=await q;if(error)return toast(errMsg(error));S._debts=data;
+  const open=data.filter(x=>Number(x.remaining)>0),late=open.filter(x=>x.due_date&&x.due_date<today());
+  $('#uSum').innerHTML=`<div class="grid2"><div class="kpi"><div class="l">Sisa ${UK} belum ${UK==='piutang'?'diterima':'dibayar'}</div><div class="v amt ${UK==='piutang'?'in':'out'}">${rp(open.reduce((s,x)=>s+Number(x.remaining),0))}</div><div class="muted">${open.length} catatan</div></div>
+   <div class="kpi"><div class="l">Lewat jatuh tempo</div><div class="v" style="color:${late.length?'var(--r)':'inherit'}">${rp(late.reduce((s,x)=>s+Number(x.remaining),0))}</div><div class="muted">${late.length} catatan</div></div></div>`;
+  $('#uL').classList.remove('muted');
+  $('#uL').innerHTML=data.length?`<div class="list">${data.map(x=>{const wa=UK==='piutang'&&x.party_phone&&Number(x.remaining)>0?waLink(x):'';
+    return `<div class="it"><div style="min-width:0"><div><b>${esc(x.party_name)}</b> ${dueTag(x)}</div><div class="muted">${esc(x.description)} · sejak ${fmtDs(x.issue_date)}${x.party_phone?' · '+esc(x.party_phone):''}</div>
+     <div class="muted">Total ${rp(x.amount)} · sudah ${UK==='piutang'?'diterima':'dibayar'} ${rp(x.paid)}</div>${x.note?`<div class="muted">📝 ${esc(x.note)}</div>`:''}
+     <div class="row wrapf" style="margin-top:6px">${Number(x.remaining)>0?`<button class="btn sm grn" onclick="formPay('${x.id}')">${UK==='piutang'?'Terima pembayaran':'Bayar'}</button>`:''}
+     <button class="btn sm sec" onclick="payHist('${x.id}')">Riwayat</button><button class="btn sm sec" onclick="formDebt('${x.id}')">Ubah</button>${wa}
+     <button class="btn sm sec" style="color:var(--r)" onclick="delDebt('${x.id}')">Hapus</button></div></div>
+     <div style="text-align:right"><div class="muted">Sisa</div><div class="amt ${UK==='piutang'?'in':'out'}">${rp(x.remaining)}</div></div></div>`}).join('')}</div>`:`<p class="muted">Belum ada ${UK}${$('#uDone').checked?'':' yang belum lunas'}.</p>`;
+}
+function waLink(x){let p=String(x.party_phone).replace(/[^\d]/g,'');if(p.startsWith('0'))p='62'+p.slice(1);
+  const msg=`Halo ${x.party_name}, kami dari ${S.biz.name}. Mengingatkan tagihan "${x.description}" sebesar ${rp(x.remaining)}${x.due_date?' dengan jatuh tempo '+fmtDs(x.due_date):''}. Terima kasih.`;
+  return `<a class="btn sm sec" target="_blank" rel="noopener" href="https://wa.me/${p}?text=${encodeURIComponent(msg)}">Ingatkan via WA</a>`}
+function formDebt(id){const x=id?S._debts.find(d=>d.id===id):{kind:UK,issue_date:today()};const k=x.kind;
+  openModal(`<h2>${id?'Ubah':'Catat'} ${k}</h2>
+   <label>${k==='piutang'?'Nama pelanggan / peminjam':'Nama supplier / pemberi pinjaman'}</label><input id="dP" value="${esc(x.party_name||'')}" placeholder="${k==='piutang'?'cth. Toko Berkah':'cth. CV Sumber Bahan'}">
+   <label>No. HP/WA (opsional)</label><input id="dPh" inputmode="tel" value="${esc(x.party_phone||'')}" placeholder="08xxxxxxxxxx">
+   <label>Keterangan</label><input id="dDe" value="${esc(x.description||'')}" placeholder="${k==='piutang'?'cth. Pembelian 10 dus tempo 2 minggu':'cth. Beli bahan tempo / pinjaman modal'}">
+   <div class="grid2"><div><label>Nominal (Rp)</label><input id="dA" inputmode="numeric" value="${fmtMoney(x.amount)}" ${id&&x.trx_id?'disabled':''}></div>
+   <div><label>Jatuh tempo (opsional)</label><input id="dDu" type="date" value="${x.due_date||''}"></div></div>
+   ${id?'':`<label>Tanggal</label><input id="dI" type="date" value="${today()}" max="${today()}">
+   <div class="alert i" style="margin-top:10px"><label style="margin:0;color:inherit"><input type="checkbox" id="dCash"> ${k==='piutang'?'Ini pinjaman <b>uang</b>: uang keluar dari kas/rekening sekarang':'Ini pinjaman <b>uang</b>: uang masuk ke kas/rekening sekarang'}</label>
+   <div class="muted" style="margin-top:4px">${k==='piutang'?'Jangan dicentang untuk penjualan tempo (barang/jasa sudah diberikan, uang belum diterima).':'Jangan dicentang untuk pembelian tempo (barang sudah diterima, belum dibayar).'}</div></div>
+   <div id="dPayW" class="hide">${payPicker('d')}</div>`}
+   <label>Catatan (opsional)</label><input id="dN" value="${esc(x.note||'')}">
+   <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Batal</button><button class="btn" id="dOk">Simpan</button></div>`);
+  moneyInput($('#dA'));
+  if(!id){bindPayPicker('d');$('#dCash').onchange=()=>$('#dPayW').classList.toggle('hide',!$('#dCash').checked)}
+  $('#dOk').onclick=async()=>{const party=$('#dP').value.trim(),descr=$('#dDe').value.trim(),amt=num($('#dA').value);
+    if(!party)return toast('Isi nama');if(!descr)return toast('Isi keterangan');if(!amt)return toast('Isi nominal');
+    try{let r;
+      if(id){const row={party_name:party,party_phone:$('#dPh').value.trim()||null,description:descr,due_date:$('#dDu').value||null,note:$('#dN').value.trim()||null};if(!x.trx_id)row.amount=amt;
+        r=await sb.from('debts').update(row).eq('id',id)}
+      else{const cash=$('#dCash').checked;const pay=cash?readPay('d'):{method:null,acc:null,br:null};
+        r=await sb.rpc('create_debt',{bid:S.biz.id,dkind:k,party,phone:$('#dPh').value.trim()||null,descr,amt,issue:$('#dI').value||today(),due:$('#dDu').value||null,record_cash:cash,meth:pay.method,acc:pay.acc,br:pay.br,dnote:$('#dN').value.trim()||null})}
+      if(r.error)throw r.error;closeModal();toast('Tersimpan');loadUtang()}catch(e){toast(errMsg(e))}}}
+function formPay(id){const x=S._debts.find(d=>d.id===id);const pi=x.kind==='piutang';
+  openModal(`<h2>${pi?'Terima pembayaran piutang':'Bayar hutang'}</h2><p><b>${esc(x.party_name)}</b> · ${esc(x.description)}<br><span class="muted">Sisa ${rp(x.remaining)}</span></p>
+   <div class="grid2"><div><label>Nominal (Rp)</label><input id="yA" inputmode="numeric" value="${fmtMoney(x.remaining)}"></div><div><label>Tanggal</label><input id="yD" type="date" value="${today()}" max="${today()}"></div></div>
+   ${payPicker('y')}<label>Catatan (opsional)</label><input id="yN" placeholder="cth. Cicilan ke-2">
+   <p class="muted">Otomatis tercatat sebagai uang ${pi?'masuk':'keluar'} di kas/rekening yang dipilih.</p>
+   <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Batal</button><button class="btn grn" id="yOk">Simpan</button></div>`);
+  moneyInput($('#yA'));bindPayPicker('y');
+  $('#yOk').onclick=async()=>{const amt=num($('#yA').value);if(!amt)return toast('Isi nominal');
+    try{const p=readPay('y');const {error}=await sb.rpc('pay_debt',{did:id,amt,d:$('#yD').value||today(),meth:p.method,acc:p.acc,br:p.br,pnote:$('#yN').value.trim()||null});if(error)throw error;
+      closeModal();toast(Number(x.remaining)===amt?'Lunas ✓':'Pembayaran tersimpan');loadUtang()}catch(e){toast(errMsg(e))}}}
+async function payHist(id){const x=S._debts.find(d=>d.id===id);const {data,error}=await sb.from('debt_payments').select('*').eq('debt_id',id).order('pay_date');if(error)return toast(errMsg(error));
+  openModal(`<h2>Riwayat ${x.kind}</h2><p><b>${esc(x.party_name)}</b> · ${esc(x.description)}<br><span class="muted">Total ${rp(x.amount)} · sisa ${rp(x.remaining)}</span></p>
+   <div class="list">${data.map(p=>`<div class="it"><div>${fmtDs(p.pay_date)} · ${METHODS[p.method]||p.method}${p.bank_account_id?' · '+esc(accLabel(accById(p.bank_account_id))):''}${p.note?'<div class="muted">'+esc(p.note)+'</div>':''}</div>
+   <div class="row"><b>${rp(p.amount)}</b><button class="btn sm sec" style="color:var(--r)" onclick="delPay('${p.id}')">Hapus</button></div></div>`).join('')||'<p class="muted">Belum ada pembayaran.</p>'}</div>
+   <button class="btn full sec" onclick="closeModal()">Tutup</button>`)}
+async function delPay(pid){if(!await confirmBox('Hapus pembayaran ini? Uang masuk/keluar yang terkait ikut terhapus.','Hapus'))return;
+  const {data,error}=await sb.rpc('delete_debt_payment',{pid});if(error)return toast(errMsg(error));toast(data);loadUtang()}
+async function delDebt(id){const x=S._debts.find(d=>d.id===id);if(Number(x.paid)>0)return toast('Hapus dulu pembayarannya lewat tombol Riwayat');
+  if(!await confirmBox(`Hapus ${x.kind} ${esc(x.party_name)} ${rp(x.amount)}?${x.trx_id?' Uang masuk/keluar yang tercatat saat pinjaman ikut terhapus.':''}`,'Hapus'))return;
+  const {data,error}=await sb.rpc('delete_debt',{did:id});if(error)return toast(errMsg(error));toast(data);loadUtang()}
+
+/* ---------- KASBON ---------- */
+async function viewKasbon(){
+  $('#app').innerHTML=`<div class="row sp">${backBtnF()}<div class="row"><button class="btn sm sec" onclick="formKasbon('bayar')">Bayar kasbon</button><button class="btn sm" onclick="formKasbon('pinjam')">+ Kasbon baru</button></div></div>
+   <div class="card"><h2>Kasbon karyawan</h2><p class="muted">Pinjaman karyawan dan cicilannya. Kasbon tunai/transfer otomatis tercatat sebagai uang keluar; pembayaran lewat potong gaji tidak mengubah kas.</p><div id="kbL" class="muted">Memuat...</div></div>`;
+  const {data,error}=await sb.from('kasbon_balance').select('*').eq('business_id',S.biz.id).order('sisa',{ascending:false});if(error)return toast(errMsg(error));S._kb=data;
+  const open=data.filter(x=>Number(x.sisa)>0);
+  $('#kbL').classList.remove('muted');
+  $('#kbL').innerHTML=data.length?`<div class="kpi" style="margin-bottom:8px"><div class="l">Total kasbon belum kembali</div><div class="v amt out">${rp(open.reduce((s,x)=>s+Number(x.sisa),0))}</div><div class="muted">${open.length} karyawan</div></div>
+   <div class="list">${data.map((x,i)=>`<div class="it"><div><b>${esc(x.employee_name)}</b> ${Number(x.sisa)>0?'':'<span class="tag in">lunas</span>'}<div class="muted">Pinjam ${rp(x.total_pinjam)} · kembali ${rp(x.total_bayar)} · terakhir ${fmtDs(x.last_date)}</div>
+   <div class="row" style="margin-top:6px">${Number(x.sisa)>0?`<button class="btn sm grn" onclick="formKasbon('bayar',${i})">Bayar</button>`:''}<button class="btn sm sec" onclick="kbHist(${i})">Riwayat</button></div></div>
+   <div style="text-align:right"><div class="muted">Sisa</div><div class="amt out">${rp(x.sisa)}</div></div></div>`).join('')}</div>`:'<p class="muted">Belum ada kasbon.</p>';
+}
+function formKasbon(kind,i){const x=i!=null?S._kb[i]:null;const names=[...new Set((S._kb||[]).map(k=>k.employee_name).concat(S.members.filter(m=>m.role==='staff').map(m=>m.display_name)))];
+  openModal(`<h2>${kind==='pinjam'?'Kasbon baru':'Pembayaran kasbon'}</h2>
+   <label>Nama karyawan</label><input id="kN" list="kNames" value="${esc(x?x.employee_name:'')}" placeholder="cth. Budi"><datalist id="kNames">${names.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+   ${x?`<p class="muted">Sisa kasbon ${rp(x.sisa)}</p>`:''}
+   <div class="grid2"><div><label>Nominal (Rp)</label><input id="kA" inputmode="numeric" value="${x&&kind==='bayar'?fmtMoney(x.sisa):''}"></div><div><label>Tanggal</label><input id="kD" type="date" value="${today()}" max="${today()}"></div></div>
+   ${payPicker('k',{method:kind==='bayar'?'potong_gaji':'tunai',potong:kind==='bayar'})}
+   <label>Catatan (opsional)</label><input id="kNt" placeholder="${kind==='pinjam'?'cth. Untuk biaya sekolah, cicil 3x':'cth. Potong gaji Desember'}">
+   <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Batal</button><button class="btn" id="kOk">Simpan</button></div>`);
+  moneyInput($('#kA'));bindPayPicker('k');
+  $('#kOk').onclick=async()=>{const e=$('#kN').value.trim(),amt=num($('#kA').value);if(!e)return toast('Isi nama karyawan');if(!amt)return toast('Isi nominal');
+    try{const p=readPay('k');const {error}=await sb.rpc('add_kasbon',{bid:S.biz.id,employee:e,kkind:kind,amt,d:$('#kD').value||today(),meth:p.method,acc:p.acc,br:p.br,knote:$('#kNt').value.trim()||null});if(error)throw error;
+      closeModal();toast('Kasbon tersimpan');viewKasbon()}catch(err){toast(errMsg(err))}}}
+async function kbHist(i){const x=S._kb[i];const {data,error}=await sb.from('kasbon').select('*').eq('business_id',S.biz.id).ilike('employee_name',x.employee_name).order('entry_date').order('created_at');if(error)return toast(errMsg(error));
+  let bal=0;openModal(`<h2>Riwayat kasbon ${esc(x.employee_name)}</h2><div class="tblw"><table><tr><th>Tanggal</th><th>Jenis</th><th class="n">Nominal</th><th class="n">Sisa</th><th></th></tr>
+   ${data.map(k=>{bal+=k.kind==='pinjam'?Number(k.amount):-Number(k.amount);return `<tr><td>${fmtDs(k.entry_date)}</td><td>${k.kind==='pinjam'?'<span class="tag out">pinjam</span>':'<span class="tag in">bayar</span>'}<div class="muted">${k.method==='potong_gaji'?'potong gaji':(METHODS[k.method]||k.method)}${k.note?' · '+esc(k.note):''}</div></td>
+    <td class="n">${rp(k.amount)}</td><td class="n">${rp(bal)}</td><td><button class="btn sm sec" style="color:var(--r)" onclick="delKb('${k.id}')">Hapus</button></td></tr>`}).join('')}</table></div>
+   <button class="btn full sec" onclick="closeModal()">Tutup</button>`)}
+async function delKb(id){if(!await confirmBox('Hapus catatan kasbon ini? Uang masuk/keluar yang terkait ikut terhapus.','Hapus'))return;
+  const {data,error}=await sb.rpc('delete_kasbon',{kid:id});if(error)return toast(errMsg(error));closeModal();toast(data);viewKasbon()}
+
+/* ---------- LAPORAN ---------- */
+async function viewLap(){
+  const d=today(),first=d.slice(0,8)+'01';
+  $('#app').innerHTML=`<div class="row sp noprint">${backBtnF()}</div><div class="card noprint"><h2>Laporan owner</h2>
+   ${multiBr()?`<label>Cabang</label><select id="rB">${brOptions(S.br,true)}</select>`:''}
+   <div class="row wrapf" style="margin-top:8px"><button class="btn sm sec" data-p="h">Hari ini</button><button class="btn sm sec" data-p="m">7 hari</button><button class="btn sm sec" data-p="b">Bulan ini</button></div>
+   <div class="grid2"><div><label>Dari</label><input type="date" id="rF" value="${first}"></div><div><label>Sampai</label><input type="date" id="rT" value="${d}"></div></div>
+   <div style="height:10px"></div><div class="row wrapf"><button class="btn" id="rGo">Buat laporan</button><button class="btn sec" onclick="window.print()">Cetak / PDF</button><button class="btn sec" id="rCsv">Unduh Excel (CSV)</button></div></div>
+   <div id="rep"></div>`;
+  document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=b.dataset.p;$('#rT').value=d;$('#rF').value=p==='h'?d:(p==='m'?addDays(d,-6):first);loadLap()});
+  if($('#rB'))$('#rB').onchange=()=>{S.br=$('#rB').value||null;loadLap()};
+  $('#rGo').onclick=loadLap;$('#rCsv').onclick=csv;loadLap();
+}
+async function loadLap(){
+  let F=$('#rF').value;const T=$('#rT').value;if(F>T)return toast('Tanggal awal melewati tanggal akhir');
+  if(F<S.biz.start_date){F=S.biz.start_date;$('#rF').value=F}
+  if(F>T)return toast('Usaha baru aktif sejak '+fmtD(S.biz.start_date));
+  const brs=S.br?S.branches.filter(b=>b.id===S.br):actBr();
+  $('#rep').innerHTML='<div class="card muted">Menyusun laporan...</div>';
+  let tq=sb.from('transactions').select('*').eq('business_id',S.biz.id).gte('trx_date',F).lte('trx_date',T).order('trx_date').order('created_at');if(S.br)tq=tq.eq('branch_id',S.br);
+  const [{data:all,error:e2},{data:cl},{data:led},{data:ds},{data:kb},...ops]=await Promise.all([tq,
+    sb.from('cash_closings').select('*').eq('business_id',S.biz.id).gte('close_date',F).lte('close_date',T),
+    sb.rpc('account_ledger',{bid:S.biz.id,f:F,t:T}),
+    sb.from('debt_status').select('*').eq('business_id',S.biz.id).eq('cancelled',false).gt('remaining',0),
+    sb.from('kasbon_balance').select('*').eq('business_id',S.biz.id).gt('sisa',0),
+    ...brs.map(b=>sb.rpc('owner_cash_position',{bid:S.biz.id,d:F,br:b.id}))]);
+  if(e2)return toast(errMsg(e2));const oe=ops.find(o=>o.error);if(oe)return toast(errMsg(oe.error));S._rep=all;
+  const tx=all.filter(t=>t.status==='approved'),biz=tx.filter(t=>!t.transfer_group);
+  const sum=(a,f)=>a.filter(f).reduce((s,t)=>s+Number(t.amount),0);
+  const tin=sum(biz,t=>t.direction==='in'),tout=sum(biz,t=>t.direction==='out');
+  // cash book per branch, then combine by day
+  const byDay={};let diffTot=0;const brSum={};
+  brs.forEach((b,i)=>{let op=Number(ops[i].data[0].opening);brSum[b.id]={d:0,closed:0,days:0};
+    for(let day=F,k=0;day<=T&&k<370;day=addDays(day,1),k++){
+      const ci=sum(tx,t=>t.branch_id===b.id&&t.trx_date===day&&t.method==='tunai'&&t.direction==='in'),co=sum(tx,t=>t.branch_id===b.id&&t.trx_date===day&&t.method==='tunai'&&t.direction==='out');
+      const ex=op+ci-co,c=(cl||[]).find(x=>x.branch_id===b.id&&x.close_date===day);
+      const r=byDay[day]=byDay[day]||{day,op:0,ci:0,co:0,ex:0,counted:0,diff:0,nc:0,end:0};
+      r.op+=op;r.ci+=ci;r.co+=co;r.ex+=ex;brSum[b.id].days++;
+      if(c){r.counted+=Number(c.counted);r.diff+=Number(c.diff);r.nc++;diffTot+=Number(c.diff);brSum[b.id].d+=Number(c.diff);brSum[b.id].closed++}
+      op=c?Number(c.counted):ex;r.end+=op}});
+  const rows=Object.values(byDay).sort((a,b)=>a.day<b.day?-1:1);const nb=brs.length;
+  const grp=(arr,keyf)=>{const g={};arr.forEach(t=>{const k=keyf(t);g[k]=g[k]||{in:0,out:0,n:0};g[k][t.direction]+=Number(t.amount);g[k].n++});return Object.entries(g).sort((a,b)=>(b[1].in+b[1].out)-(a[1].in+a[1].out))};
+  const tbl=(title,entries,note='')=>`<div class="card"><h2>${title}</h2>${note?`<p class="muted">${note}</p>`:''}<div class="tblw"><table><tr><th></th><th class="n">Trx</th><th class="n">Masuk</th><th class="n">Keluar</th></tr>${entries.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${v.n}</td><td class="n amt in">${rp(v.in)}</td><td class="n amt out">${rp(v.out)}</td></tr>`).join('')||'<tr><td colspan="4" class="muted">Tidak ada data</td></tr>'}</table></div></div>`;
+  const noProof=biz.filter(t=>t.direction==='out'&&!t.proof_path&&t.source==='manual').length,unrec=tx.filter(t=>t.method!=='tunai'&&!t.reconciled).length;
+  const pend=all.filter(t=>t.status==='pending'),rej=all.filter(t=>t.status==='rejected');
+  const cashEnd=rows.length?rows[rows.length-1].end:0;
+  const accEnd=(led||[]).reduce((s,a)=>s+Number(a.closing),0);
+  const pi=(ds||[]).filter(x=>x.kind==='piutang'),hu=(ds||[]).filter(x=>x.kind==='hutang');
+  const scope=S.br?esc(brName(S.br)):(multiBr()?'Semua cabang':'');
+  $('#rep').innerHTML=`<div class="card"><div class="muted">${esc(S.biz.name)}${scope?' · '+scope:''} · ${fmtD(F)} – ${fmtD(T)}</div><h2>Ringkasan</h2>
+   <div class="grid2"><div class="kpi"><div class="l">Total uang masuk usaha</div><div class="v amt in">${rp(tin)}</div></div><div class="kpi"><div class="l">Total uang keluar usaha</div><div class="v amt out">${rp(tout)}</div></div>
+   <div class="kpi"><div class="l">Selisih masuk − keluar</div><div class="v">${rp(tin-tout)}</div></div><div class="kpi"><div class="l">Total selisih tutup kas</div><div class="v" style="color:${diffTot<0?'var(--r)':(diffTot>0?'var(--a)':'var(--g)')}">${rp(diffTot)}</div></div>
+   <div class="kpi"><div class="l">Saldo tunai akhir${scope?' ('+scope+')':''}</div><div class="v">${rp(cashEnd)}</div></div><div class="kpi"><div class="l">Saldo rekening akhir</div><div class="v">${rp(accEnd)}</div></div>
+   <div class="kpi"><div class="l">Total uang (tunai + rekening)</div><div class="v" style="color:var(--p)">${rp(cashEnd+accEnd)}</div></div>
+   <div class="kpi"><div class="l">Perlu dicek</div><div class="v" style="font-size:13.5px">${noProof} keluar tanpa bukti<br>${unrec} non-tunai belum cocok mutasi${pend.length?`<br>${pend.length} menunggu persetujuan (${rp(sum(pend,()=>true))})`:''}${rej.length?`<br>${rej.length} ditolak`:''}</div></div></div>
+   <p class="muted">Uang masuk/keluar usaha tidak termasuk pindah dana antar kas, cabang & rekening, serta pengeluaran yang belum disetujui atau ditolak. Rekening bank dihitung untuk seluruh usaha.</p></div>
+   ${!S.br&&multiBr()?`<div class="card"><h2>Per cabang</h2><div class="tblw"><table><tr><th>Cabang</th><th class="n">Masuk</th><th class="n">Keluar</th><th class="n">Selisih tutup kas</th></tr>${brs.map(b=>{const a=biz.filter(t=>t.branch_id===b.id);const x=brSum[b.id];
+      return `<tr><td>${esc(b.name)}<div class="muted">tutup kas ${x.closed}/${x.days} hari</div></td><td class="n amt in">${rp(sum(a,t=>t.direction==='in'))}</td><td class="n amt out">${rp(sum(a,t=>t.direction==='out'))}</td><td class="n" style="color:${x.d<0?'var(--r)':(x.d>0?'var(--a)':'var(--g)')}">${rp(x.d)}</td></tr>`}).join('')}</table></div></div>`:''}
+   <div class="card"><h2>Buku kas tunai harian${scope?' — '+scope:''}</h2><p class="muted">Saldo awal + Masuk − Keluar = Saldo akhir. Bila kas sudah ditutup, saldo awal besok memakai uang fisik.</p><div class="tblw"><table><tr><th>Tanggal</th><th class="n">Saldo awal</th><th class="n">Masuk</th><th class="n">Keluar</th><th class="n">Saldo akhir</th><th class="n">Fisik / selisih</th></tr>
+   ${rows.map(r=>`<tr><td style="white-space:nowrap">${new Date(r.day+'T00:00:00').toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short'})}</td><td class="n">${rp(r.op)}</td><td class="n amt in">${rp(r.ci)}</td><td class="n amt out">${rp(r.co)}</td><td class="n"><b>${rp(r.ex)}</b></td><td class="n">${r.nc?`${rp(r.counted)}<br><span style="color:${r.diff===0?'var(--g)':(r.diff<0?'var(--r)':'var(--a)')}">${r.diff===0?'cocok':rp(r.diff)}</span>${nb>1?`<div class="muted">${r.nc}/${nb} cabang</div>`:''}`:'<span class="muted">belum ditutup</span>'}</td></tr>`).join('')}</table></div></div>
+   <div class="card"><h2>Buku rekening</h2><div class="tblw"><table><tr><th>Rekening</th><th class="n">Saldo awal</th><th class="n">Masuk</th><th class="n">Keluar</th><th class="n">Saldo akhir</th></tr>
+   ${(led||[]).map(a=>`<tr><td>${esc(a.bank_name)}${a.account_no?'<div class="muted">'+esc(a.account_no)+(a.holder_name?' a.n. '+esc(a.holder_name):'')+'</div>':''}</td><td class="n">${rp(a.opening)}</td><td class="n amt in">${rp(a.money_in)}</td><td class="n amt out">${rp(a.money_out)}</td><td class="n"><b>${rp(a.closing)}</b></td></tr>`).join('')||'<tr><td colspan="5" class="muted">Belum ada rekening</td></tr>'}</table></div></div>
+   ${tbl('Per kategori',grp(biz,t=>catName(t.category_id)))}
+   ${tbl('Per metode pembayaran',grp(biz,t=>METHODS[t.method]+(t.account?' · '+t.account:'')))}
+   ${tbl('Per pencatat',grp(biz,t=>nameOf(t.recorded_by)))}
+   ${tbl('Per objek transaksi (teratas)',grp(biz,t=>t.object).slice(0,15))}
+   <div class="card"><h2>Posisi piutang, hutang & kasbon (saat ini)</h2><div class="tblw"><table><tr><th></th><th class="n">Catatan</th><th class="n">Sisa</th></tr>
+    <tr><td>Piutang belum diterima</td><td class="n">${pi.length}</td><td class="n amt in">${rp(pi.reduce((s,x)=>s+Number(x.remaining),0))}</td></tr>
+    <tr><td>Hutang belum dibayar</td><td class="n">${hu.length}</td><td class="n amt out">${rp(hu.reduce((s,x)=>s+Number(x.remaining),0))}</td></tr>
+    <tr><td>Kasbon karyawan belum kembali</td><td class="n">${(kb||[]).length}</td><td class="n amt out">${rp((kb||[]).reduce((s,x)=>s+Number(x.sisa),0))}</td></tr></table></div></div>`;
+}
+function csv(){const tx=S._rep||[];if(!tx.length)return toast('Buat laporan dulu');
+  const h=['Tanggal','Jam catat','Cabang','Jenis','Status','Sumber','Metode','Rekening','Nominal','Objek','Kategori','Dari/Kepada','Yang bertransaksi','Dicatat oleh','Ada bukti','Cocok mutasi','Keterangan','Catatan persetujuan'];
+  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const st={approved:'Tercatat',pending:'Menunggu persetujuan',rejected:'Ditolak'};
+  const lines=[h.map(q).join(';')].concat(tx.map(t=>[t.trx_date,fmtT(t.created_at),brName(t.branch_id),t.direction==='in'?'Masuk':'Keluar',st[t.status],t.source==='manual'?'Catat':SOURCES[t.source],METHODS[t.method],t.account,t.amount,t.object,catName(t.category_id),t.counterparty,t.actor_name,nameOf(t.recorded_by),t.proof_path?'Ya':'Tidak',t.method==='tunai'?'-':(t.reconciled?'Ya':'Belum'),t.note,t.review_note].map(q).join(';')));
+  const b=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`OwnerKasPro_${$('#rF').value}_${$('#rT').value}.csv`;a.click()}
+
+/* ---------- TIM & PENGATURAN ---------- */
+async function viewTim(){
+  const {data:mm}=await sb.from('members').select('user_id,display_name,role,active,created_at,branch_id').eq('business_id',S.biz.id).order('created_at');S.members=mm||[];
+  const staff=S.members.filter(m=>m.role==='staff'&&m.active).length;
+  $('#app').innerHTML=`<div class="row sp">${backBtnF()}</div><div class="card"><h2>Ajak karyawan bergabung</h2><p class="muted">Karyawan daftar akun di OwnerKas Pro, lalu memasukkan kode ${multiBr()?'cabang tempat ia bekerja':'usaha ini'}:</p>
+   ${actBr().map(b=>`<div class="row sp wrapf" style="margin:8px 0">${multiBr()?`<b>${esc(b.name)}</b>`:''}<div class="row"><div class="code">${esc(b.join_code)}</div><button class="btn sm sec" onclick="copyInvite('${b.id}')">Salin undangan</button></div></div>`).join('')}
+   <p class="muted">Kuota karyawan aktif: ${staff} dari ${S.biz.staff_quota}.</p></div>
+   <div class="card"><h2>Anggota</h2><div class="list">${S.members.map(m=>`<div class="it"><div style="flex:1"><b>${esc(m.display_name)}</b><div class="muted">${m.role==='owner'?'Owner · semua cabang':'Karyawan'} · bergabung ${fmtT(m.created_at)}</div>
+   ${m.role==='staff'&&multiBr()?`<select style="margin-top:6px;max-width:260px" onchange="setMemBr('${m.user_id}',this.value)">${brOptions(m.branch_id||mainBr())}</select>`:''}</div>
+   ${m.role==='staff'?`<button class="btn sm ${m.active?'sec':''}" onclick="toggleMem('${m.user_id}',${!m.active})">${m.active?'Nonaktifkan':'Aktifkan'}</button>`:''}</div>`).join('')}</div></div>
+   <div class="card"><h2>Data usaha</h2><label>Nama usaha</label><input id="zN" value="${esc(S.biz.name)}" maxlength="60">
+   <label>Jenis usaha</label><select id="zT">${Object.entries(BTYPE).map(([k,v])=>`<option value="${k}" ${S.biz.biz_type===k?'selected':''}>${v}</option>`).join('')}</select>
+   <label>Batas persetujuan pengeluaran karyawan (Rp)</label><input id="zL" inputmode="numeric" placeholder="Kosongkan = tidak aktif" value="${fmtMoney(S.biz.approval_limit)}">
+   <label style="color:var(--t)"><input type="checkbox" id="zS" ${S.biz.stock_enabled?'checked':''}> Aktifkan fitur stok barang</label>
+   <div style="height:10px"></div><button class="btn sec" id="zSave">Simpan</button></div>
+   <div class="card"><h2>Kategori</h2><p class="muted">Ketuk Ubah untuk mengganti nama atau jenis. Kategori bertanda "otomatis" dipakai menu Kasbon, Piutang & Hutang, dan Pindah dana.</p><div class="list" id="catList">${S.cats.map(catRow).join('')}</div>
+   <div class="grid2"><input id="nCat" placeholder="Kategori baru"><select id="nDir"><option value="out">Keluar</option><option value="in">Masuk</option></select></div>
+   <div style="height:8px"></div><button class="btn sec" id="nAdd">Tambah kategori</button></div>`;
+  moneyInput($('#zL'));
+  $('#zSave').onclick=async()=>{const n=$('#zN').value.trim();if(!n)return toast('Isi nama usaha');const l=$('#zL').value.trim();
+    const {error}=await sb.from('businesses').update({name:n,biz_type:$('#zT').value,approval_limit:l===''?null:num(l),stock_enabled:$('#zS').checked}).eq('id',S.biz.id);if(error)return toast(errMsg(error));
+    await reloadBiz();$('#bizName').textContent=S.biz.name+(S.mems.length>1?' ▾':'');toast('Data usaha tersimpan')};
+  $('#nAdd').onclick=async()=>{const name=$('#nCat').value.trim();if(!name)return;if(S.cats.some(x=>x.direction===$('#nDir').value&&x.name.toLowerCase()===name.toLowerCase()))return toast('Kategori dengan nama itu sudah ada');
+    const {error}=await sb.from('categories').insert({business_id:S.biz.id,name,direction:$('#nDir').value});
+    if(error)return toast(errMsg(error));await reloadCats();toast('Kategori ditambah');viewTim()};
+}
+function copyInvite(bid){const b=S.branches.find(x=>x.id===bid);const t=`Gabung OwnerKas Pro ${S.biz.name}${multiBr()?' — '+b.name:''}: buka ${location.href.split('#')[0].split('?')[0]} lalu daftar, masukkan kode ${b.join_code}`;
+  navigator.clipboard&&navigator.clipboard.writeText(t);toast('Pesan undangan disalin')}
+async function setMemBr(uid,br){const {error}=await sb.from('members').update({branch_id:br}).eq('business_id',S.biz.id).eq('user_id',uid);if(error)return toast(errMsg(error));toast('Cabang karyawan diperbarui')}
+function catRow(c){return `<div class="it" id="cat-${c.id}"><div><span class="tag ${c.direction}">${c.direction==='in'?'Masuk':'Keluar'}</span> ${esc(c.name)} ${c.sys?'<span class="tag x">otomatis</span>':''}</div>
+  ${c.sys?'':`<div class="row"><button class="btn sm sec" onclick="editCat('${c.id}')">Ubah</button><button class="btn sm sec" style="color:var(--r)" onclick="delCat('${c.id}')">Hapus</button></div>`}</div>`}
+async function catUsage(id){const {count}=await sb.from('transactions').select('id',{count:'exact',head:true}).eq('category_id',id);return count||0}
+function editCat(id){const c=S.cats.find(x=>x.id===id);if(!c)return;const el=document.getElementById('cat-'+id);
+  el.innerHTML=`<div style="flex:1"><div class="grid2"><input id="eCat-${id}" value="${esc(c.name)}" maxlength="60"><select id="eDir-${id}"><option value="out" ${c.direction==='out'?'selected':''}>Keluar</option><option value="in" ${c.direction==='in'?'selected':''}>Masuk</option></select></div>
+  <div class="row" style="margin-top:8px"><button class="btn sm" onclick="saveCat('${id}')">Simpan</button><button class="btn sm sec" onclick="viewTim()">Batal</button></div></div>`;
+  document.getElementById('eCat-'+id).focus()}
+async function saveCat(id){const c=S.cats.find(x=>x.id===id);if(!c)return;
+  const name=document.getElementById('eCat-'+id).value.trim(),dir=document.getElementById('eDir-'+id).value;
+  if(!name)return toast('Nama kategori tidak boleh kosong');
+  if(S.cats.some(x=>x.id!==id&&x.direction===dir&&x.name.toLowerCase()===name.toLowerCase()))return toast('Kategori dengan nama itu sudah ada');
+  if(dir!==c.direction){const n=await catUsage(id);if(n>0)return toast(`Jenis tidak bisa diubah: kategori ini sudah dipakai ${n} transaksi. Ubah namanya saja, atau buat kategori baru.`,4500)}
+  const {error}=await sb.from('categories').update({name,direction:dir}).eq('id',id).eq('business_id',S.biz.id);if(error)return toast(errMsg(error));
+  await reloadCats();toast('Kategori diperbarui');viewTim()}
+async function delCat(id){const c=S.cats.find(x=>x.id===id);if(!c)return;const n=await catUsage(id);
+  const msg=n>0?`Hapus kategori "${esc(c.name)}"? Kategori ini dipakai ${n} transaksi. Transaksinya tetap ada, tetapi kategorinya menjadi kosong (—).`:`Hapus kategori "${esc(c.name)}"?`;
+  if(!await confirmBox(msg,'Hapus'))return;
+  const {error}=await sb.from('categories').delete().eq('id',id).eq('business_id',S.biz.id);if(error)return toast(errMsg(error));
+  await reloadCats();toast('Kategori dihapus');viewTim()}
+async function toggleMem(uid,v){const {error}=await sb.from('members').update({active:v}).eq('business_id',S.biz.id).eq('user_id',uid);if(error)return toast(errMsg(error));toast(v?'Karyawan diaktifkan':'Karyawan dinonaktifkan');viewTim()}
+
+/* ---------- RINGKASAN WA ---------- */
+async function viewWa(){
+  $('#app').innerHTML=`<div class="row sp">${backBtnF()}</div><div class="card"><h2>Ringkasan WA harian</h2><p class="muted">Setiap hari pada jam yang dipilih, ringkasan dikirim otomatis ke WhatsApp owner. Isinya: kas tiap cabang dan hasil tutup kas, saldo rekening, total uang, pengeluaran yang menunggu persetujuan, piutang/hutang jatuh tempo, dan stok menipis.</p><div id="waBox" class="muted">Memuat...</div></div>
+   <div class="card"><div class="row sp"><h2>Pratinjau hari ini</h2><button class="btn sm sec" onclick="viewWa()">Muat ulang</button></div><div id="waPrev" class="muted">Memuat...</div></div>`;
+  const [{data:ws},{data:msg,error}]=await Promise.all([sb.from('wa_settings').select('*').eq('business_id',S.biz.id).maybeSingle(),sb.rpc('wa_summary_preview',{bid:S.biz.id,d:today()})]);
+  const w=ws||{enabled:false,phones:'',send_hour:21};S._waMsg=msg||'';
+  const until=S.biz.wa_until,active=until&&until>=today();
+  $('#waBox').classList.remove('muted');
+  $('#waBox').innerHTML=`<div class="alert ${active?'ok':'w'}">${active?`Layanan aktif sampai <b>${fmtDs(until)}</b>.`:`Layanan ${until?'berakhir '+fmtDs(until):'belum aktif'}. Hubungi admin OwnerKas Pro untuk memperpanjang. Ringkasan tetap bisa dibagikan manual lewat tombol di bawah.`}</div>
+   <label style="color:var(--t);margin-top:12px"><input type="checkbox" id="waOn" ${w.enabled?'checked':''}> Kirim otomatis setiap hari</label>
+   <label>Nomor WA penerima (maks. 3, pisahkan dengan koma)</label><input id="waPh" inputmode="tel" value="${esc((w.phones||'').split(',').filter(Boolean).map(p=>p.replace(/^62/,'0')).join(', '))}" placeholder="cth. 081234567890, 081298765432">
+   <label>Jam kirim (WIB)</label><select id="waH">${Array.from({length:24},(_,h)=>`<option value="${h}" ${Number(w.send_hour)===h?'selected':''}>${String(h).padStart(2,'0')}.00</option>`).join('')}</select>
+   <p class="muted">Pilih jam setelah semua cabang tutup kas, misalnya 21.00 atau 22.00.</p>
+   ${w.last_status?`<p class="muted">Pengiriman terakhir: ${esc(w.last_status)}${w.last_at?' · '+fmtT(w.last_at):''}</p>`:''}
+   <div class="row wrapf"><button class="btn" id="waSave">Simpan</button><button class="btn sec" id="waTest">Kirim tes sekarang</button></div>`;
+  $('#waPrev').classList.remove('muted');
+  $('#waPrev').innerHTML=error?`<p class="muted">${esc(errMsg(error))}</p>`:`<div style="white-space:pre-wrap;background:#e7f6ec;border-radius:12px;padding:12px;font-size:14px">${waFmt(msg)}</div>
+   <div class="row wrapf" style="margin-top:10px"><a class="btn sec" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">Bagikan manual via WhatsApp saya</a><button class="btn sec" onclick="navigator.clipboard&&navigator.clipboard.writeText(S._waMsg);toast('Ringkasan disalin')">Salin teks</button></div>`;
+  $('#waSave').onclick=async()=>{const row={business_id:S.biz.id,enabled:$('#waOn').checked,phones:$('#waPh').value.trim(),send_hour:Number($('#waH').value)};
+    const {error}=await sb.from('wa_settings').upsert(row);if(error)return toast(errMsg(error));toast(row.enabled?`Tersimpan. Ringkasan dikirim tiap hari jam ${String(row.send_hour).padStart(2,'0')}.00 WIB`:'Tersimpan (pengiriman otomatis mati)',4000);viewWa()};
+  $('#waTest').onclick=async()=>{const b=$('#waTest');b.disabled=true;b.textContent='Mengirim...';
+    try{const {data,error}=await sb.functions.invoke('ringkasan-wa',{body:{action:'test',business_id:S.biz.id}});
+      let info=data&&data.info;if(error){try{const j=await error.context.json();info=j.info||j.error}catch(e){info=errMsg(error)}}
+      toast(info||'Selesai',5000)}finally{b.disabled=false;b.textContent='Kirim tes sekarang';setTimeout(viewWa,1200)}};
+}
+const waFmt=t=>esc(t||'').replace(/\*([^*\n]+)\*/g,'<b>$1</b>').replace(/_([^_\n]+)_/g,'<i>$1</i>');
+
+/* ---------- CABANG ---------- */
+async function viewCabang(){
+  await reloadBranches();const d=today();
+  const pos=await Promise.all(S.branches.map(b=>b.active?sb.rpc('owner_cash_position',{bid:S.biz.id,d,br:b.id}):Promise.resolve({data:[{expected:null}]})));
+  const {data:mm}=await sb.from('members').select('user_id,role,active,branch_id').eq('business_id',S.biz.id);
+  const nAct=actBr().length,mx=S.biz.max_branches;
+  $('#app').innerHTML=`<div class="row sp">${backBtnF()}<button class="btn sm" onclick="formBranch()" ${nAct>=mx?'disabled':''}>+ Cabang</button></div>
+   <div class="card"><h2>Cabang</h2><p class="muted">Setiap cabang punya laci kas, tutup kas, dan kode gabung karyawan sendiri. Rekening bank dipakai bersama. Cabang aktif: ${nAct} dari ${mx}.</p>
+   ${S.branches.map((b,i)=>{const st=(mm||[]).filter(m=>m.role==='staff'&&m.active&&(m.branch_id||mainBr())===b.id).length;
+     return `<div class="acc" style="${b.active?'':'opacity:.6'}"><div class="row sp"><div><b>${esc(b.name)}</b> ${b.active?'':'<span class="tag x">nonaktif</span>'}${b.address?`<div class="muted">${esc(b.address)}</div>`:''}
+     <div class="muted">Kode gabung <b>${esc(b.join_code)}</b> · ${st} karyawan · mulai ${fmtDs(b.start_date)}</div></div>
+     ${b.active?`<div style="text-align:right"><div class="muted">Kas seharusnya</div><b>${rp(pos[i].data[0].expected)}</b></div>`:''}</div>
+     <div class="row wrapf" style="margin-top:8px">${b.active?`<button class="btn sm" onclick="S.br='${b.id}';go('dash')">Lihat ringkasan</button>`:''}<button class="btn sm sec" onclick="formBranch('${b.id}')">Ubah</button>
+     <button class="btn sm sec" onclick="toggleBranch('${b.id}',${!b.active})">${b.active?'Nonaktifkan':'Aktifkan'}</button></div></div>`}).join('')}</div>
+   ${nAct>=mx?`<div class="alert i">Batas paket Anda ${mx} cabang aktif. Nonaktifkan cabang yang tidak dipakai untuk menambah cabang baru.</div>`:''}`;
+}
+function formBranch(id){const b=id?S.branches.find(x=>x.id===id):{start_date:today(),opening_cash:0};
+  openModal(`<h2>${id?'Ubah cabang':'Tambah cabang'}</h2>
+   <label>Nama cabang</label><input id="cbN" value="${esc(b.name||'')}" placeholder="cth. Cabang Bekasi" maxlength="40">
+   <label>Alamat (opsional)</label><input id="cbA" value="${esc(b.address||'')}" placeholder="cth. Jl. Ahmad Yani 12" maxlength="120">
+   <div class="grid2"><div><label>Saldo kas tunai awal (Rp)</label><input id="cbO" inputmode="numeric" value="${fmtMoney(b.opening_cash)}" placeholder="0"></div>
+   <div><label>Mulai tanggal</label><input id="cbD" type="date" value="${b.start_date}" max="${today()}"></div></div>
+   <p class="muted">Saldo awal = uang di laci cabang pada tanggal mulai. Setelah ada tutup kas, saldo memakai hitungan fisik.</p>
+   <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Batal</button><button class="btn" id="cbOk">Simpan</button></div>`);
+  moneyInput($('#cbO'));
+  $('#cbOk').onclick=async()=>{const row={name:$('#cbN').value.trim(),address:$('#cbA').value.trim()||null,opening_cash:num($('#cbO').value),start_date:$('#cbD').value||today()};
+    if(!row.name)return toast('Isi nama cabang');
+    const r=id?await sb.from('branches').update(row).eq('id',id):await sb.from('branches').insert({...row,business_id:S.biz.id});
+    if(r.error)return toast(errMsg(r.error));closeModal();toast('Cabang tersimpan');viewCabang()}}
+async function toggleBranch(id,v){if(!v&&!await confirmBox('Nonaktifkan cabang ini? Riwayatnya tetap ada. Karyawan cabang ini sebaiknya dipindah ke cabang lain di menu Tim.','Nonaktifkan'))return;
+  const {error}=await sb.from('branches').update({active:v}).eq('id',id);if(error)return toast(errMsg(error));if(!v&&S.br===id)S.br=null;toast(v?'Cabang diaktifkan':'Cabang dinonaktifkan');viewCabang()}
+
+/* ---------- STOK ---------- */
+let STQ='';
+async function viewStok(){
+  if(!S.biz.stock_enabled){$('#app').innerHTML=`<div class="row sp">${backBtnF()}</div><div class="card"><h2>Stok barang</h2><p class="muted">Fitur stok tidak aktif. Aktifkan di Menu → Tim & Pengaturan → Data usaha.</p></div>`;return}
+  const owner=isOwner();
+  $('#app').innerHTML=`<div class="row sp">${backBtnF()}<div class="row">${owner?`<button class="btn sm sec" onclick="stockHist()">Riwayat</button><button class="btn sm" onclick="formItem()">+ Barang</button>`:''}</div></div>
+   ${owner?brBar('viewStok()'):''}
+   <div class="card"><h2>Stok barang${!owner&&S.branches[0]?' — '+esc(S.branches[0].name):(S.br?' — '+esc(brName(S.br)):'')}</h2>
+   <input id="stQ" placeholder="Cari nama / kode barang" value="${esc(STQ)}"><div class="row" style="margin-top:8px"><label style="margin:0;color:var(--t)"><input type="checkbox" id="stLow"> hanya stok menipis</label></div>
+   <div id="stL" class="muted" style="margin-top:8px">Memuat...</div></div>`;
+  const {data,error}=await sb.rpc('stock_levels',{bid:S.biz.id,br:owner?S.br:null});if(error)return toast(errMsg(error));
+  const items={};(data||[]).forEach(r=>{const it=items[r.item_id]=items[r.item_id]||{id:r.item_id,name:r.name,sku:r.sku,unit:r.unit,min:Number(r.min_stock),price:r.sell_price,active:r.active,rows:[],tot:0};it.rows.push(r);it.tot+=Number(r.qty)});
+  S._items=items;
+  const render=()=>{const q=$('#stQ').value.trim().toLowerCase();STQ=q;const lowOnly=$('#stLow').checked;
+    const list=Object.values(items).filter(i=>(owner||i.active)&&(!q||i.name.toLowerCase().includes(q)||(i.sku||'').toLowerCase().includes(q))&&(!lowOnly||i.rows.some(r=>i.min>0&&Number(r.qty)<=i.min)));
+    $('#stL').classList.remove('muted');
+    $('#stL').innerHTML=list.length?`<div class="list">${list.map(i=>{const low=i.rows.some(r=>i.min>0&&Number(r.qty)<=i.min);
+      return `<div class="it"><div style="min-width:0;flex:1"><b>${esc(i.name)}</b> ${i.active?'':'<span class="tag x">nonaktif</span>'}${low?' <span class="tag w">menipis</span>':''}
+      <div class="muted">${i.sku?esc(i.sku)+' · ':''}min ${fmtQty(i.min)} ${esc(i.unit)}${i.price?' · harga '+rp(i.price):''}</div>
+      ${i.rows.length>1?`<div class="muted">${i.rows.map(r=>`${esc(r.branch_name)}: <b style="color:${i.min>0&&Number(r.qty)<=i.min?'var(--r)':'inherit'}">${fmtQty(r.qty)}</b>`).join(' · ')}</div>`:''}
+      <div class="row wrapf" style="margin-top:6px">${i.active?`<button class="btn sm grn" onclick="formMove('${i.id}','masuk')">+ Masuk</button><button class="btn sm red" onclick="formMove('${i.id}','keluar')">− Keluar</button>`:''}
+      ${owner&&i.active?`<button class="btn sm sec" onclick="formMove('${i.id}','opname')">Opname</button>${multiBr()?`<button class="btn sm sec" onclick="formStTransfer('${i.id}')">Pindah</button>`:''}<button class="btn sm sec" onclick="formItem('${i.id}')">Ubah</button>`:''}${owner&&!i.active?`<button class="btn sm sec" onclick="formItem('${i.id}')">Ubah</button>`:''}</div></div>
+      <div style="text-align:right"><div class="muted">${i.rows.length>1?'Total':'Stok'}</div><b style="font-size:18px;color:${low?'var(--r)':'inherit'}">${fmtQty(i.tot)}</b><div class="muted">${esc(i.unit)}</div></div></div>`}).join('')}</div>`
+      :`<p class="muted">${Object.keys(items).length?'Tidak ada barang yang cocok.':(owner?'Belum ada barang. Tambahkan barang dulu, lalu catat stok masuk.':'Owner belum menambahkan barang.')}</p>`};
+  $('#stQ').oninput=render;$('#stLow').onchange=render;render();
+}
+function formItem(id){const i=id?S._items[id]:{unit:'pcs',min:0,active:true};
+  openModal(`<h2>${id?'Ubah barang':'Tambah barang'}</h2>
+   <label>Nama barang</label><input id="iN" value="${esc(i.name||'')}" placeholder="cth. Oli mesin 1L" maxlength="80">
+   <div class="grid2"><div><label>Kode/SKU (opsional)</label><input id="iS" value="${esc(i.sku||'')}" maxlength="40"></div><div><label>Satuan</label><input id="iU" value="${esc(i.unit)}" placeholder="pcs / botol / kg" maxlength="20"></div></div>
+   <div class="grid2"><div><label>Stok minimum (peringatan)</label><input id="iM" inputmode="decimal" value="${i.min||''}" placeholder="0"></div><div><label>Harga jual (opsional)</label><input id="iP" inputmode="numeric" value="${fmtMoney(i.price)}"></div></div>
+   ${id?`<label style="color:var(--t)"><input type="checkbox" id="iA" ${i.active?'checked':''}> Barang aktif</label>`:'<p class="muted">Setelah disimpan, catat stok awal lewat tombol "+ Masuk" atau "Opname".</p>'}
+   <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Batal</button><button class="btn" id="iOk">Simpan</button></div>`);
+  moneyInput($('#iP'));
+  $('#iOk').onclick=async()=>{const row={name:$('#iN').value.trim(),sku:$('#iS').value.trim()||null,unit:$('#iU').value.trim()||'pcs',min_stock:Number(String($('#iM').value).replace(',','.'))||0,sell_price:$('#iP').value?num($('#iP').value):null};
+    if(!row.name)return toast('Isi nama barang');if(id)row.active=$('#iA').checked;
+    const r=id?await sb.from('items').update(row).eq('id',id):await sb.from('items').insert({...row,business_id:S.biz.id});
+    if(r.error)return toast(/duplicate|unique/i.test(r.error.message)?'Nama barang sudah ada':errMsg(r.error));closeModal();toast('Barang tersimpan');viewStok()}}
+function formMove(id,kind){const i=S._items[id];const owner=isOwner();const lbl={masuk:'Stok masuk',keluar:'Stok keluar',opname:'Stok opname (hitung fisik)'}[kind];
+  const br=owner?(S.br||mainBr()):null;const cur=r=>Number((i.rows.find(x=>x.branch_id===r)||i.rows[0]||{qty:0}).qty);
+  openModal(`<h2>${lbl}</h2><p><b>${esc(i.name)}</b><br><span class="muted" id="mvCur">Stok saat ini: ${fmtQty(owner?cur(br):i.tot)} ${esc(i.unit)}</span></p>
+   ${owner&&multiBr()?`<label>Cabang</label><select id="mvB">${brOptions(br)}</select>`:''}
+   <div class="grid2"><div><label>${kind==='opname'?'Jumlah fisik sekarang':'Jumlah'} (${esc(i.unit)})</label><input id="mvQ" inputmode="decimal" placeholder="0"></div>
+   ${owner?`<div><label>Tanggal</label><input id="mvD" type="date" value="${today()}" max="${today()}"></div>`:''}</div>
+   <label>Catatan (opsional)</label><input id="mvN" placeholder="${kind==='masuk'?'cth. Kulakan dari supplier':kind==='keluar'?'cth. Terjual / dipakai servis':'cth. Hitung stok akhir bulan'}">
+   <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Batal</button><button class="btn" id="mvOk">Simpan</button></div>`);
+  if($('#mvB'))$('#mvB').onchange=()=>$('#mvCur').textContent=`Stok saat ini: ${fmtQty(cur($('#mvB').value))} ${i.unit}`;
+  $('#mvOk').onclick=async()=>{const q=Number(String($('#mvQ').value).replace(',','.'));if(isNaN(q)||$('#mvQ').value===''||(kind!=='opname'&&q<=0))return toast('Isi jumlah');
+    const {data,error}=await sb.rpc('stock_move',{bid:S.biz.id,it:id,mkind:kind,qty:q,d:owner?($('#mvD').value||today()):today(),mnote:$('#mvN').value.trim()||null,br:$('#mvB')?$('#mvB').value:br});
+    if(error)return toast(errMsg(error));closeModal();toast(`Tersimpan. Stok sekarang ${fmtQty(data)} ${i.unit}`+(data<0?' (minus, cek lagi)':''),4000);viewStok()}}
+function formStTransfer(id){const i=S._items[id];const b=actBr();
+  openModal(`<h2>Pindah stok antar cabang</h2><p><b>${esc(i.name)}</b><br><span class="muted">${i.rows.map(r=>esc(r.branch_name)+': '+fmtQty(r.qty)).join(' · ')}</span></p>
+   <div class="grid2"><div><label>Dari</label><select id="stF">${brOptions(b[0].id)}</select></div><div><label>Ke</label><select id="stT">${brOptions(b[1].id)}</select></div></div>
+   <label>Jumlah (${esc(i.unit)})</label><input id="stQn" inputmode="decimal"><label>Catatan (opsional)</label><input id="stN">
+   <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" onclick="closeModal()">Batal</button><button class="btn" id="stOk">Pindahkan</button></div>`);
+  $('#stOk').onclick=async()=>{const q=Number(String($('#stQn').value).replace(',','.'));if(!q||q<=0)return toast('Isi jumlah');
+    const {data,error}=await sb.rpc('stock_transfer',{bid:S.biz.id,it:id,qty:q,from_br:$('#stF').value,to_br:$('#stT').value,d:today(),mnote:$('#stN').value.trim()||null});
+    if(error)return toast(errMsg(error));closeModal();toast(data);viewStok()}}
+async function stockHist(){let q=sb.from('stock_moves').select('*').eq('business_id',S.biz.id).order('created_at',{ascending:false}).limit(100);if(S.br)q=q.eq('branch_id',S.br);
+  const {data,error}=await q;if(error)return toast(errMsg(error));const nm=id=>(S._items&&S._items[id]||{}).name||'—';
+  const K={masuk:['in','masuk'],keluar:['out','keluar'],opname:['w','opname'],pindah_masuk:['p','pindah masuk'],pindah_keluar:['p','pindah keluar']};
+  openModal(`<h2>Riwayat stok</h2><p class="muted">100 catatan terakhir${S.br?' · '+esc(brName(S.br)):''}.</p><div class="list">${(data||[]).map(m=>`<div class="it"><div><span class="tag ${K[m.kind][0]}">${K[m.kind][1]}</span> <b>${esc(nm(m.item_id))}</b>
+   <div class="muted">${fmtDs(m.move_date)}${multiBr()?' · '+esc(brName(m.branch_id)):''} · ${esc(nameOf(m.created_by))}${m.note?' · '+esc(m.note):''}</div></div>
+   <div class="row"><b>${m.delta>0?'+':''}${fmtQty(m.delta)}</b><button class="btn sm sec" style="color:var(--r)" onclick="delMove('${m.id}')">Hapus</button></div></div>`).join('')||'<p class="muted">Belum ada catatan stok.</p>'}</div><button class="btn full sec" onclick="closeModal()">Tutup</button>`)}
+async function delMove(id){if(!await confirmBox('Hapus catatan stok ini? Stok dihitung ulang. Pindah stok terhapus kedua sisinya.','Hapus'))return;
+  const {data,error}=await sb.rpc('delete_stock_move',{mid:id});if(error)return toast(errMsg(error));closeModal();toast(data);viewStok()}
+
+sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_OUT')viewAuth()});
+boot();
+</script>
+</body>
+</html>
